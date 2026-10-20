@@ -86,6 +86,14 @@ button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;bo
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:50}.modal.on{display:flex}
 .sheet{background:var(--bg2);width:100%;max-width:var(--W);border-radius:20px 20px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom))}.sheet h2{margin-bottom:14px;font-size:18px}
 .toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:#fff;color:#111;padding:10px 18px;border-radius:999px;font-weight:600;opacity:0;transition:.3s;pointer-events:none;z-index:60;white-space:nowrap;font-size:14px}.toast.on{opacity:1}
+body.light{background:#e9ebf0}body.light{--bg:#ffffff;--bg2:#f3f4f7;--bg3:#e6e8ee;--line:#dde0e7;--tx:#16181d;--tx2:#5d6474}body.light .tag{color:#4a5060}
+.dt{padding:0 0 90px}.dhero{height:340px;background:center/cover no-repeat;position:relative;display:flex;align-items:center;justify-content:center;font-size:90px}.dhero:after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 55%,var(--bg))}
+.dhero .ib{position:absolute;top:10px;z-index:2;background:rgba(0,0,0,.45);color:#fff}.dbody{padding:0 16px;margin-top:-30px;position:relative;z-index:1}.dbody h2{font-size:24px;margin:0}.dsub{color:var(--tx2);font-size:13px;margin:4px 0 10px}
+.dsec{color:var(--tx2);font-size:12px;font-weight:700;margin:16px 0 6px}.gbub{background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px;line-height:1.6;white-space:pre-wrap}.gbub em{color:var(--tx2)}
+.dbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--W);display:flex;gap:8px;padding:10px 16px 16px;background:linear-gradient(transparent,var(--bg) 30%);z-index:5}.dbar .pbtn{flex:1}
+.fav{font-size:20px;min-width:52px}.fav.on{color:var(--ac)}.hrt{position:absolute;top:6px;left:6px;font-size:14px;text-shadow:0 1px 3px #000}
+.pick{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-height:300px;overflow:auto;margin-top:8px}.pick div{aspect-ratio:3/4;background:center/cover;border-radius:8px;cursor:pointer;border:2px solid transparent}.pick div:hover{border-color:var(--ac)}
+.myrow{display:flex;gap:10px;overflow-x:auto;padding:0 16px 6px}.myrow .card{flex:0 0 31%}.mkc{aspect-ratio:3/4;border:2px dashed var(--line);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--tx2);font-size:13px;gap:4px}.mkc i{font-size:28px;font-style:normal}
 </style></head><body>
 <div id="app"></div><div id="tbar"></div>
 <div class="modal" id="setm"><div class="sheet">
@@ -108,6 +116,8 @@ const SEED=[{"id": "c0011", "name": "연하율", "age": "31세 · 웹툰 작가"
 const GEN={s1:'남',s3:'남',s5:'남',s7:'남',s9:'남',s11:'남',s13:'남',s15:'남',s2:'여',s4:'여',s6:'여',s8:'여',s10:'여',s12:'여',s14:'여',s16:'여'};
 let chars=LS.get('cc_chars',null);if(!chars||LS.get('cc_ver',0)<210){chars=[...SEED.map(c=>({...c,seed:1})),...(chars||[]).filter(c=>!c.seed)];LS.set('cc_chars',chars);LS.set('cc_ver',210)}
 chars.forEach(c=>{if(!c.gender)c.gender=GEN[c.id]||'기타'});
+const favs=()=>LS.get('cc_fav',[]);const isFav=id=>favs().includes(id);function togFav(id){let f=favs();f=f.includes(id)?f.filter(x=>x!==id):[id,...f];LS.set('cc_fav',f);toast(f.includes(id)?'찜했어요 ❤️':'찜을 해제했어요');return f.includes(id)}
+if(LS.get('cc_theme','dark')==='light')document.body.classList.add('light');
 const saveChars=()=>LS.set('cc_chars',chars);
 let cat='전체',gen='전체',q='',htab='home',bTimer=null;
 const today=()=>new Date().toLocaleDateString('sv');
@@ -124,17 +134,17 @@ function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clea
 const TABS=[['','홈','🏠'],['disc','발견','🧭'],['create','만들기','＋'],['chats','대화','💬'],['my','MY','👤']];
 function tabbar(cur){$('#tbar').innerHTML=cur==null?'':`<nav class="tb">${TABS.map(([h,n,i])=>`<button class="${h===cur?'on':''} ${h==='create'?'mk':''}" data-h="${h}"><i>${i}</i>${n}</button>`).join('')}</nav>`;$$('.tb button').forEach(b=>b.onclick=()=>{location.hash=b.dataset.h})}
 function route(){clearInterval(bTimer);const h=location.hash.slice(1).split('/');$('#app').classList.toggle('full',h[0]==='chat');
-if(h[0]==='chat'){tabbar(null);chat(h[1])}else if(h[0]==='edit'){tabbar('create');edit(h[1])}else if(h[0]==='create'){tabbar('create');edit()}
+if(h[0]==='chat'){tabbar(null);chat(h[1])}else if(h[0]==='c'){tabbar(null);detail(h[1])}else if(h[0]==='edit'){tabbar('create');edit(h[1])}else if(h[0]==='create'){tabbar('create');edit()}
 else if(h[0]==='disc'){tabbar('disc');disc()}else if(h[0]==='chats'){tabbar('chats');chats()}else if(h[0]==='my'){tabbar('my');my()}else{tabbar('');home()}window.scrollTo(0,0)}
 window.onhashchange=route;
 const foot=`<div class="aif">ⓘ 캐릭챗의 대화·이미지는 AI가 생성한 것이에요. 모든 캐릭터는 가상의 인물이며 실존 인물·작품과 관련이 없어요.<br>표시된 대화 수는 데모용 예시 숫자예요.</div>`;
-function card(c,rank){return `<div class="card" onclick="location.hash='chat/${c.id}'"><div class="cimg" style="${c.img?'':avBg(c)}" data-bg="${c.img?esc(c.img):''}">${avTxt(c)}${rank?`<span class="rk">${rank}</span>`:''}${c.seed?`<span class="cnt">💬 ${k(cnt(c))} <span class="demo">데모</span></span>`:'<span class="mine">내 캐릭터</span>'}</div><div class="cn">${esc(c.name)}</div><div class="ci">${esc(c.greet?c.greet.replace(/\*[^*]*\*/g,'').trim()||c.intro:c.intro)}</div><div class="tags">${(c.tags||[]).slice(0,3).map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div></div>`}
+function card(c,rank){return `<div class="card" onclick="location.hash='c/${c.id}'"><div class="cimg" style="${c.img?'':avBg(c)}" data-bg="${c.img?esc(c.img):''}">${avTxt(c)}${isFav(c.id)?'<span class="hrt">❤️</span>':''}${rank?`<span class="rk">${rank}</span>`:''}${c.seed?`<span class="cnt">💬 ${k(cnt(c))} <span class="demo">데모</span></span>`:'<span class="mine">내 캐릭터</span>'}</div><div class="cn">${esc(c.name)}</div><div class="ci">${esc(c.greet?c.greet.replace(/\*[^*]*\*/g,'').trim()||c.intro:c.intro)}</div><div class="tags">${(c.tags||[]).slice(0,3).map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div></div>`}
 const BAN=[['신규','방과 후, 우리 반 이야기','학원물 캐릭터 4명과 청춘 일상 시작하기','linear-gradient(135deg,#ff5c7a,#8b5cff)','🌸','disc/학원물'],['추천','오늘 밤은 판타지 세계로','마법학원 수석부터 천 년 흑룡까지','linear-gradient(135deg,#1e3c72,#7b4397)','🐉','disc/판타지'],['이벤트','나만의 캐릭터를 만들어보세요','한 줄 아이디어만 쓰면 자동으로 채워져요','linear-gradient(135deg,#11998e,#3b5bdb)','✨','create']];
 function home(){
 $('#app').innerHTML=`<div class="top"><div class="logo" onclick="location.hash=''">캐릭챗</div><div class="sp"></div><button class="ib" title="검색" onclick="location.hash='disc';setTimeout(()=>$('#q')&&$('#q').focus(),50)">🔍</button><button class="ib" title="알림" onclick="toast('새 알림이 없어요 (데모)')">🔔<span class="dot"></span></button></div>
 <div class="bnw"><div class="bn" id="bn">${BAN.map(b=>`<div class="bi" style="background:${b[3]}" data-go="${b[5]}"><small>${b[0]}</small><i>${b[4]}</i><b>${b[1]}</b><span>${b[2]}</span></div>`).join('')}</div><div class="dots">${BAN.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div></div>
-<div class="st"><button data-t="home" class="${htab==='home'?'on':''}">홈</button><button data-t="rank" class="${htab==='rank'?'on':''}">랭킹</button></div>
-${htab==='home'?`<div class="lbl">🔥 지금 많이 대화하는 캐릭터</div>`:`<div class="lbl">🏆 대화 수 순위 <span class="demo">데모 숫자</span></div>`}<div class="grid">${htab==='home'?chars.map(c=>card(c)).join(''):[...chars].filter(c=>c.seed).sort((a,b)=>cnt(b)-cnt(a)).map((c,i)=>card(c,i+1)).join('')}</div>${foot}`;
+<div class="st"><button data-t="home" class="${htab==='home'?'on':''}">홈</button><button data-t="rank" class="${htab==='rank'?'on':''}">랭킹</button><button data-t="fav" class="${htab==='fav'?'on':''}">찜 ❤️</button></div>
+${htab==='fav'?(()=>{const f=favs().map(i=>chars.find(c=>c.id===i)).filter(Boolean);return `<div class="lbl">❤️ 찜한 캐릭터 ${f.length}</div>`+(f.length?`<div class="grid">${f.map(c=>card(c)).join('')}</div>`:`<div class="empty">아직 찜한 캐릭터가 없어요.<br>캐릭터 상세에서 🤍를 눌러보세요</div>`)})()+foot:''}${htab==='home'?`<div class="lbl">✨ 내 캐릭터 <small style="font-weight:400;color:var(--tx2)">${chars.filter(c=>!c.seed).length}</small></div><div class="myrow"><div class="card" onclick="location.hash='create'"><div class="mkc"><i>＋</i>새 캐릭터</div></div>${chars.filter(c=>!c.seed).map(c=>card(c)).join('')}</div>`:''}${htab==='fav'?'<!--':''}${htab==='home'?`<div class="lbl">🔥 지금 많이 대화하는 캐릭터</div>`:`<div class="lbl">🏆 대화 수 순위 <span class="demo">데모 숫자</span></div>`}<div class="grid">${htab==='home'?chars.filter(c=>c.seed).map(c=>card(c)).join(''):[...chars].filter(c=>c.seed).sort((a,b)=>cnt(b)-cnt(a)).map((c,i)=>card(c,i+1)).join('')}</div>${foot}${htab==='fav'?'-->':''}`;
 $$('.st button').forEach(b=>b.onclick=()=>{htab=b.dataset.t;home()});
 $$('.bi').forEach(b=>b.onclick=()=>{const g=b.dataset.go.split('/');if(g[0]==='disc'){cat=g[1];gen='전체';q=''}location.hash=g[0]});
 const bn=$('#bn'),ds=$$('.dots i');bn.onscroll=()=>{const i=Math.round(bn.scrollLeft/bn.clientWidth);ds.forEach((d,j)=>d.classList.toggle('on',i===j))};
@@ -147,6 +157,14 @@ $('#app').innerHTML=`<div class="top"><div class="ttl">발견</div></div><input 
 $('#q').oninput=e=>{q=e.target.value;grid()};$$('[data-c]').forEach(b=>b.onclick=()=>{cat=b.dataset.c;disc()});$$('[data-g]').forEach(b=>b.onclick=()=>{gen=b.dataset.g;disc()});grid()}
 function grid(){const s=q.trim().toLowerCase().replace(/^#/,'');const l=chars.filter(c=>(cat==='전체'||(cat==='내 캐릭터'?!c.seed:c.cat===cat))&&(gen==='전체'||c.gender===gen)&&(!s||(c.name+c.intro+(c.tags||[]).join(' ')).toLowerCase().includes(s)));
 $('#grid').innerHTML=l.length?l.map(c=>card(c)).join(''):`<div class="empty">조건에 맞는 캐릭터가 없어요 🥲</div>`}
+function detail(id){const c=chars.find(x=>x.id===id);if(!c){location.hash='';return}const has=(LS.get('cc_chat_'+id,[])||[]).some(x=>x.r==='user');
+$('#app').innerHTML=`<div class="dt"><div class="dhero" style="${avBg(c)}">${avTxt(c)}<button class="ib" style="left:10px" onclick="history.length>1?history.back():location.hash=''">←</button>${c.seed?'':`<button class="ib" style="right:10px" onclick="location.hash='edit/${c.id}'">✏️</button>`}</div>
+<div class="dbody"><h2>${esc(c.name)}</h2><div class="dsub">${esc(c.age||c.gender||'')} · ${esc(c.cat||'')} ${c.seed?`· 💬 ${k(cnt(c))} <span class="demo">데모</span>`:'· 내 캐릭터'}</div>
+<div class="tags" style="height:auto">${(c.tags||[]).map(t=>`<span class="tag" style="cursor:pointer" data-t="${esc(t)}">#${esc(t)}</span>`).join('')}</div>
+<div class="dsec">소개</div><div>${esc(c.intro)}</div>${c.greet?`<div class="dsec">첫 메시지</div><div class="gbub">${fmt(c.greet)}</div>`:''}${foot}</div>
+<div class="dbar"><button class="gbtn fav ${isFav(id)?'on':''}" id="dfv">${isFav(id)?'❤️':'🤍'}</button><button class="pbtn" onclick="location.hash='chat/${c.id}'">${has?'💬 대화 이어하기':'💬 대화 시작'}</button></div></div>`;
+$('#dfv').onclick=()=>{const on=togFav(id);$('#dfv').textContent=on?'❤️':'🤍';$('#dfv').classList.toggle('on',on)};
+$$('[data-t]').forEach(t=>t.onclick=()=>{q='#'+t.dataset.t;cat='전체';gen='전체';location.hash='disc'})}
 function ago(t){if(!t)return '';const d=(Date.now()-t)/1000;return d<60?'방금':d<3600?Math.floor(d/60)+'분 전':d<86400?Math.floor(d/3600)+'시간 전':Math.floor(d/86400)+'일 전'}
 function chats(){const M=meta();const l=chars.map(c=>({c,m:LS.get('cc_chat_'+c.id,null),t:M[c.id]||0})).filter(x=>x.m&&x.m.some(y=>y.r==='user')).sort((a,b)=>b.t-a.t);
 $('#app').innerHTML=`<div class="top"><div class="ttl">대화</div></div>${l.length?l.map(({c,m,t})=>{const last=m[m.length-1];return `<div class="li" onclick="location.hash='chat/${c.id}'"><div class="mav" style="${avBg(c)}">${avTxt(c)}</div><div class="lt"><b>${esc(c.name)}<small>${ago(t)}</small></b><p>${last.r==='user'?'나: ':''}${esc(last.t.replace(/\*/g,'').replace(/\n+/g,' '))}</p></div></div>`}).join(''):`<div class="empty">아직 대화한 캐릭터가 없어요.<br><br><button class="pbtn" onclick="location.hash=''">캐릭터 둘러보기</button></div>`}${foot}`}
@@ -158,10 +176,12 @@ $('#app').innerHTML=`<div class="top"><div class="ttl">MY</div></div><div class=
 <p class="hint" style="margin-top:6px">메시지 1번에 1 크레딧이 차감돼요. 체험용 가상 크레딧이라 충전·환불·현금 가치가 없어요.</p></div>
 <div class="box menu"><div class="li" onclick="openSet()"><span style="flex:1">⚙️ AI 연결 설정 (API)</span><small class="mode">${s.key?'🟢 '+esc(s.model||'gpt-4o-mini'):'🟡 데모 모드'}</small></div>
 <div class="li" style="cursor:default"><span style="flex:1">🛡️ 세이프 모드<br><small class="mode">성인·폭력적 내용 차단 · 데모에서는 항상 켜져 있어요</small></span><span class="sw on lock" title="잠김"></span></div>
+<div class="li" id="th"><span style="flex:1">🌗 화면 테마</span><small class="mode">${document.body.classList.contains('light')?'☀️ 라이트':'🌙 다크'}</small></div>
+<div class="li" onclick="location.hash='create'"><span style="flex:1">✨ 내 캐릭터 만들기</span><small class="mode">${chars.filter(c=>!c.seed).length}개</small></div>
 <div class="li" id="rs" style="color:#ff6b6b">🗑️ 데이터 초기화</div></div>${foot}</div>`;
 $('#p-s').onclick=()=>{LS.set('cc_profile',{nick:$('#p-n').value.trim(),persona:$('#p-p').value.trim()});toast('프로필을 저장했어요')};
 $('#ck').onclick=()=>{const c=cred();if(c.last===today())return;c.bal+=30;c.last=today();LS.set('cc_credits',c);toast('출석 완료! 데모 크레딧 +30');my()};
-$('#rs').onclick=()=>{if(!confirm('내 캐릭터, 대화 기록, 프로필, 설정을 모두 지울까요?'))return;Object.keys(localStorage).filter(k=>k.startsWith('cc_')).forEach(k=>localStorage.removeItem(k));location.hash='';location.reload()}}
+$('#th').onclick=()=>{const l=document.body.classList.toggle('light');LS.set('cc_theme',l?'light':'dark');my()};$('#rs').onclick=()=>{if(!confirm('내 캐릭터, 대화 기록, 프로필, 설정을 모두 지울까요?'))return;Object.keys(localStorage).filter(k=>k.startsWith('cc_')).forEach(k=>localStorage.removeItem(k));location.hash='';location.reload()}}
 const NAMES=['서린','도윤','하윤','지호','유리','태하','나은','시안','리아','은호'];
 const KW=[['학원물',/학교|학생|반장|선배|동아리|전학/],['직장',/회사|직장|팀장|사원|상사|카페|의사|알바|선생/],['판타지',/마법|용|드래곤|기사|마녀|엘프|왕|판타지|수인|악마|천사/],['로맨스',/연애|고백|썸|아이돌|데이트/]];
 function tmpl(idea){const ct=(KW.find(([,r])=>r.test(idea))||['일상'])[0],nm=NAMES[Math.floor(Math.random()*NAMES.length)];
@@ -173,7 +193,8 @@ const pj=t=>JSON.parse(t.replace(/^[^\[{]*/,'').replace(/[^\]}]*$/,''));
 function edit(id){const c=chars.find(x=>x.id===id)||{name:'',emoji:'🙂',bg:'#3a2a3d',cat:'일상',gender:'기타',intro:'',tags:[],sys:'',greet:'',ex:'',img:''};let img=c.img||'';
 $('#app').innerHTML=`<div class="top">${id?`<button class="ib" onclick="history.back()">←</button>`:''}<div class="ttl">${id?'캐릭터 수정':'캐릭터 만들기'}</div></div><div class="form">
 ${id?'':`<div class="box quick"><h3>⚡ 한 줄 아이디어로 빠르게 만들기</h3><div class="qrow"><input id="idea" placeholder="예: 비 오는 날 우산을 빌려준 옆 반 전학생"><button class="pbtn" id="qg">채우기</button></div><p class="hint" style="margin-top:6px;color:#c9c3dd">${LS.get('cc_set',{}).key?'AI가 아래 항목을 채워줘요. 확인 후 저장하세요.':'데모 모드: 기본 틀로 채워져요. 설정에 API 키를 넣으면 AI가 채워줘요.'}</p></div>`}
-<div class="f"><label>프로필 이미지</label><div class="avrow"><div class="pv" id="pv"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;min-width:0"><input type="file" id="file" accept="image/*"><input id="iurl" placeholder="또는 이미지 URL" value="${img.startsWith('data:')?'':esc(img)}"><input id="emo" placeholder="이미지 없을 때 이모지" value="${esc(c.emoji||'🙂')}" maxlength="4"></div></div></div>
+<div class="f"><label>프로필 이미지</label><div class="avrow"><div class="pv" id="pv"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;min-width:0"><input type="file" id="file" accept="image/*"><button type="button" class="gbtn" id="pk" style="padding:8px">🖼️ 기본 초상화에서 고르기</button><input id="iurl" placeholder="또는 이미지 URL" value="${img.startsWith('data:')?'':esc(img)}"><input id="emo" placeholder="이미지 없을 때 이모지" value="${esc(c.emoji||'🙂')}" maxlength="4"></div></div></div>
+<div class="pick" id="pkg" style="display:none">${SEED.map(x=>`<div data-src="${esc(x.img)}" style="background-image:url('${esc(x.img)}')" title="${esc(x.name)}"></div>`).join('')}</div>
 <div class="f"><label>이름 *</label><input id="nm" value="${esc(c.name)}" maxlength="30"></div>
 <div style="display:flex;gap:8px"><div class="f" style="flex:1"><label>장르</label><select id="ct">${CATS.slice(1,6).map(x=>`<option ${x===c.cat?'selected':''}>${x}</option>`).join('')}</select></div><div class="f" style="flex:1"><label>성별</label><select id="gd">${['남','여','기타'].map(x=>`<option ${x===c.gender?'selected':''}>${x}</option>`).join('')}</select></div></div>
 <div class="f"><label>한 줄 소개 *</label><input id="it" value="${esc(c.intro)}" maxlength="100"></div>
@@ -184,7 +205,7 @@ ${id?'':`<div class="box quick"><h3>⚡ 한 줄 아이디어로 빠르게 만들
 <p class="hint" style="margin-bottom:12px">실존 인물이나 기존 작품 캐릭터, 성인 콘텐츠는 만들 수 없어요.</p>
 <div style="display:flex;gap:8px;justify-content:flex-end">${id&&!c.seed?'<button class="gbtn" id="del" style="color:#ff6b6b">삭제</button>':''}${id?'<button class="gbtn" onclick="history.back()">취소</button>':''}<button class="pbtn" id="sv">저장</button></div></div>`;
 const pv=()=>{const p=$('#pv');p.style.cssText=img?`background-image:url('${img.replace(/'/g,"%27")}')`:`background-color:${c.bg||'#3a2a3d'}`;p.textContent=img?'':($('#emo').value||'🙂')};pv();
-$('#emo').oninput=pv;$('#iurl').oninput=e=>{img=e.target.value.trim();pv()};
+$('#emo').oninput=pv;$('#pk').onclick=()=>{const g=$('#pkg');g.style.display=g.style.display==='none'?'grid':'none'};$$('#pkg div').forEach(d=>d.onclick=()=>{img=d.dataset.src;$('#iurl').value=img;$('#pkg').style.display='none';pv();toast('이미지를 골랐어요')});$('#iurl').oninput=e=>{img=e.target.value.trim();pv()};
 $('#file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas'),W=240,H=320,k=Math.max(W/im.width,H/im.height);cv.width=W;cv.height=H;cv.getContext('2d').drawImage(im,(W-im.width*k)/2,(H-im.height*k)/2,im.width*k,im.height*k);img=cv.toDataURL('image/jpeg',.85);pv()};im.src=r.result};r.readAsDataURL(f)};
 const fill=d=>{if(d.name)$('#nm').value=d.name;if(CATS.includes(d.cat))$('#ct').value=d.cat;if(['남','여','기타'].includes(d.gender))$('#gd').value=d.gender;if(d.intro)$('#it').value=d.intro;if(d.sys)$('#sy').value=d.sys;if(d.greet)$('#gr').value=d.greet;if(d.tags)$('#tg').value=[].concat(d.tags).join(', ')};
 if($('#qg'))$('#qg').onclick=async()=>{const idea=$('#idea').value.trim();if(!idea)return toast('아이디어를 한 줄 써주세요');const b=$('#qg');
@@ -201,7 +222,7 @@ function sugT(c){return SUG[c.cat]||SUG['일상']}
 function chat(id){const c=chars.find(x=>x.id===id);if(!c){location.hash='';return}const K='cc_chat_'+id;let m=LS.get(K,null);if(!m){m=c.greet?[{r:'assistant',t:c.greet}]:[];LS.set(K,m)}
 const set=LS.get('cc_set',{});let sel=-1,sugg=sugT(c);
 $('#app').innerHTML=`<div class="chat"><div class="chdr"><button class="ib" title="뒤로" onclick="history.length>1?history.back():location.hash=''">←</button><div class="mav" style="${avBg(c)}">${avTxt(c)}</div><div style="flex:1;min-width:0"><div style="font-weight:800">${esc(c.name)}</div><div class="mode">${set.key?'🟢 '+esc(set.model||'gpt-4o-mini'):'🟡 데모 모드'} · 🍪 <span id="cb">${cred().bal}</span> <span class="demo">데모</span></div></div>
-<button class="ib" title="다시 생성" id="rg">↻</button>${c.seed?'':`<button class="ib" title="캐릭터 수정" onclick="location.hash='edit/${c.id}'">✏️</button>`}<button class="ib" title="대화 처음부터" id="rst">🗑️</button></div>
+<button class="ib" title="찜" id="fv">${isFav(c.id)?'❤️':'🤍'}</button><button class="ib" title="다시 생성" id="rg">↻</button>${c.seed?'':`<button class="ib" title="캐릭터 수정" onclick="location.hash='edit/${c.id}'">✏️</button>`}<button class="ib" title="대화 처음부터" id="rst">🗑️</button></div>
 <div class="msgs" id="ms"></div><div class="sugg" id="sg"></div><div class="ainote">ⓘ AI가 생성한 대화·이미지입니다 · 세이프 모드 켜짐</div><div class="inbar"><textarea id="inp" rows="1" placeholder="메시지 입력 (*행동*은 별표로)"></textarea><button class="send" id="snd">➤</button></div></div>`;
 const ms=$('#ms'),inp=$('#inp');const save=()=>{LS.set(K,m);touch(id)};
 const lastA=()=>m.length&&m[m.length-1].r==='assistant'&&m.some(x=>x.r==='user');
@@ -212,7 +233,7 @@ $$('.bub[data-i]').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel=sel===i?-1
 $$('.acts button').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=b.dataset.a,i=sel;sel=-1;if(a==='regen')return regen();if(a==='copy'){navigator.clipboard?.writeText(m[i].t);toast('복사했어요');return draw()}
 $('#ed-t').value=m[i].t;$('#edm').classList.add('on');$('#ed-ok').onclick=()=>{const v=$('#ed-t').value.trim();if(v){m[i].t=v;save()}$('#edm').classList.remove('on');draw()}})};draw();
 $('#rst').onclick=()=>{if(confirm('대화를 처음부터 다시 시작할까요?')){m=c.greet?[{r:'assistant',t:c.greet}]:[];sugg=sugT(c);LS.set(K,m);draw()}};
-$('#rg').onclick=regen;
+$('#rg').onclick=regen;$('#fv').onclick=()=>{$('#fv').textContent=togFav(id)?'❤️':'🤍'};
 inp.oninput=()=>{inp.style.height='auto';inp.style.height=inp.scrollHeight+'px'};
 inp.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();send()}};$('#snd').onclick=send;
 function pay(){const cr=cred();if(cr.bal<1){toast('데모 크레딧이 부족해요 · MY에서 출석 체크!');return false}cr.bal--;LS.set('cc_credits',cr);$('#cb').textContent=cr.bal;return true}
