@@ -115,6 +115,10 @@ body.light{background:#e9ebf0}body.light{--bg:#ffffff;--bg2:#f3f4f7;--bg3:#e6e8e
 .scs{display:flex;flex-direction:column;gap:8px}.scn{background:var(--bg2);border:2px solid var(--line);border-radius:12px;padding:10px;cursor:pointer}.scn.on{border-color:var(--ac)}.scn b{font-size:13px}.scn p{margin:4px 0 0;font-size:13px;color:var(--tx2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .aff{display:flex;flex-wrap:wrap;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px}.aff b{color:var(--ac)}.aff span{font-size:13px}.aff .ab{flex-basis:100%;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden}.aff .ab i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),var(--ac2))}.aff small{color:var(--tx2);font-size:11px}
 .scn.lock{opacity:.55;border-style:dashed}.lvr{font-size:10px;color:var(--ac);font-weight:700}
+.gav{width:46px;height:46px;flex:none;display:grid;grid-template-columns:1fr 1fr;gap:2px;border-radius:14px;overflow:hidden}.gav i{background:var(--bg3) center 15%/cover}.gav i:only-child{grid-column:1/-1;grid-row:1/-1}
+.gp{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 14px}.gp div{text-align:center;font-size:11px;cursor:pointer;position:relative}.gp div i{display:block;aspect-ratio:3/4;border-radius:10px;background:var(--bg3) center 15%/cover;border:2px solid transparent;margin-bottom:3px}.gp div.on i{border-color:var(--ac)}.gp div.on:after{content:"✓";position:absolute;top:4px;right:4px;background:var(--ac);color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:18px}
+.gsel{position:sticky;bottom:76px;margin:12px 14px;display:flex;gap:8px;align-items:center;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:10px}.gsel input{flex:1;min-width:0;background:var(--bg3);border:0;border-radius:10px;padding:9px;color:var(--tx)}
+.gname{font-size:11px;color:var(--tx2);margin:0 0 3px 2px}
 </style></head><body>
 <div id="app"></div><div id="tbar"></div>
 <div class="modal" id="setm"><div class="sheet">
@@ -167,8 +171,8 @@ function k(n){return n>=10000?(n/10000).toFixed(1).replace(/\.0$/,'')+'만':n.to
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1900)}
 const TABS=[['','홈','🏠'],['disc','발견','🧭'],['create','만들기','＋'],['chats','대화','💬'],['my','MY','👤']];
 function tabbar(cur){$('#tbar').innerHTML=cur==null?'':`<nav class="tb">${TABS.map(([h,n,i])=>`<button class="${h===cur?'on':''} ${h==='create'?'mk':''}" data-h="${h}"><i>${i}</i>${n}</button>`).join('')}</nav>`;$$('.tb button').forEach(b=>b.onclick=()=>{location.hash=b.dataset.h})}
-function route(){clearInterval(bTimer);const h=location.hash.slice(1).split('/');$('#app').classList.toggle('full',h[0]==='chat');
-if(h[0]==='chat'){tabbar(null);chat(h[1])}else if(h[0]==='c'){tabbar(null);detail(h[1])}else if(h[0]==='edit'){tabbar('create');edit(h[1])}else if(h[0]==='create'){tabbar('create');edit()}
+function route(){clearInterval(bTimer);const h=location.hash.slice(1).split('/');$('#app').classList.toggle('full',h[0]==='chat'||h[0]==='room');
+if(h[0]==='chat'){tabbar(null);chat(h[1])}else if(h[0]==='room'){tabbar(null);room(h[1])}else if(h[0]==='group'){tabbar('chats');gpick()}else if(h[0]==='c'){tabbar(null);detail(h[1])}else if(h[0]==='edit'){tabbar('create');edit(h[1])}else if(h[0]==='create'){tabbar('create');edit()}
 else if(h[0]==='disc'){tabbar('disc');disc()}else if(h[0]==='chats'){tabbar('chats');chats()}else if(h[0]==='my'){tabbar('my');my()}else{tabbar('');home()}window.scrollTo(0,0)}
 window.onhashchange=route;
 const foot=`<div class="aif">ⓘ 루미(Lumi)의 대화·이미지는 AI가 생성한 것이에요. 모든 캐릭터는 가상의 인물이며 실존 인물·작품과 관련이 없어요.<br>표시된 대화 수는 데모용 예시 숫자예요.</div>`;
@@ -211,9 +215,42 @@ const go=$('#dgo');$$('.scn').forEach(e=>e.onclick=()=>{if(e.classList.contains(
 go.onclick=()=>{if(pick>0||!has){if(pick>0&&has&&!confirm('선택한 상황으로 새로 시작할까요? 지금까지의 대화는 지워져요.'))return;if(SCN[pick])LS.set('cc_chat_'+id,[{r:'assistant',t:SCN[pick].g}])}location.hash='chat/'+id};
 $('#dfv').onclick=()=>{const on=togFav(id);$('#dfv').textContent=on?'❤️':'🤍';$('#dfv').classList.toggle('on',on)};
 $$('[data-t]').forEach(t=>t.onclick=()=>{q='#'+t.dataset.t;cat='전체';gen='전체';location.hash='disc'})}
+let gsel=[];
+function gpick(){const W=Object.entries(WORLDS);
+$('#app').innerHTML=`<div class="top"><button class="ib" onclick="location.hash='chats'">←</button><div class="ttl">그룹 채팅 만들기</div></div><p class="hint" style="padding:0 16px">2~4명을 골라 한 방에서 대화해요. 같은 세계관 친구들끼리면 서로 더 잘 반응해요.</p>
+<div class="lbl">🌌 세계관으로 빠르게</div><div class="chips">${W.map(([k,w])=>`<button class="chip" data-w="${k}">${w.emoji} ${esc(w.name)}</button>`).join('')}</div><input class="search" id="gq" placeholder="🔍 캐릭터 검색">
+<div class="gp" id="gp"></div><div class="gsel"><input id="gn" placeholder="방 이름 (선택)" maxlength="20"><button class="pbtn" id="gmk">만들기 <span id="gc">0</span>/4</button></div>`;
+const list=()=>{const s=$('#gq').value.trim();const l=[...chars].sort((a,b)=>(LORE[b.id]?1:0)-(LORE[a.id]?1:0)).filter(c=>!s||(c.name+c.intro).includes(s));
+$('#gp').innerHTML=l.map(c=>`<div class="${gsel.includes(c.id)?'on':''}" data-id="${c.id}"><i style="${avBg(c)}"></i>${esc(c.name)}</div>`).join('');$('#gc').textContent=gsel.length;
+$$('#gp div').forEach(d=>d.onclick=()=>{const id=d.dataset.id;if(gsel.includes(id))gsel=gsel.filter(x=>x!==id);else{if(gsel.length>=4)return toast('최대 4명까지예요');gsel.push(id)}list()})};
+$('#gq').oninput=list;$$('[data-w]').forEach(b=>b.onclick=()=>{const ids=chars.filter(c=>LORE[c.id]&&LORE[c.id].w===b.dataset.w).map(c=>c.id);gsel=ids.sort(()=>Math.random()-.5).slice(0,3);$('#gn').value=WORLDS[b.dataset.w].name+' 모임';list()});
+$('#gmk').onclick=()=>{if(gsel.length<2)return toast('2명 이상 골라주세요');const ms=gsel.map(i=>chars.find(c=>c.id===i));const id='g'+Date.now();
+const r={id,name:$('#gn').value.trim()||ms.map(c=>c.name).join(', '),mem:[...gsel],t:Date.now(),m:ms.slice(0,2).map((c,k)=>({r:'assistant',c:c.id,t:k?`*${ms[0].name}의 말에 고개를 끄덕이며* 맞아, 반가워! 오늘은 다 같이 얘기해 보자.`:`*단체 대화방에 들어오며* 다들 모였네? 어서 와! 나는 ${c.name}. ${ms.slice(1).map(x=>x.name).join(', ')}도 같이 왔어.`}))};
+const R=LS.get('cc_rooms',[]);R.unshift(r);LS.set('cc_rooms',R);gsel=[];location.hash='room/'+id};list()}
+function gline(c,prev,t){const L=LORE[c.id];if(prev&&prev.id!==c.id){const men=LMEN[c.id+'>'+prev.id];const r=Math.random();
+if(men&&r<.4)return `*${jo(prev.name,'을','를')} 보며* ${men}`;
+if(r<.75){const T=[`*${prev.name} 말에 웃음을 터뜨린다* ${prev.name}, 그건 좀 아니지 않아?`,`*${jo(prev.name,'을','를')} 힐끗 보며* 나도 ${jo(prev.name,'이','가')} 한 말에 동의해.`,`*팔짱을 끼며* 흠, ${prev.name}답네.`,`*${prev.name}의 어깨를 툭 친다* 에이, 너무 진지하다. 우리 다른 얘기 하자!`];return T[Math.floor(Math.random()*T.length)]}}
+return demo(c,t).split('\n\n(데모')[0]}
+function room(rid){let R=LS.get('cc_rooms',[]),r=R.find(x=>x.id===rid);if(!r){location.hash='chats';return}const ms=r.mem.map(i=>chars.find(c=>c.id===i)).filter(Boolean);const set=LS.get('cc_set',{});let gbusy=false;
+$('#app').innerHTML=`<div class="chat"><div class="chdr"><button class="ib" onclick="location.hash='chats'">←</button><div class="gav" style="width:36px;height:36px">${ms.slice(0,4).map(c=>`<i style="${avBg(c)}"></i>`).join('')}</div><div style="flex:1;min-width:0"><div style="font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.name)}</div><div class="mode">${ms.map(c=>esc(c.name)).join(' · ')} · ${set.key?'🟢 AI':'🟡 데모 모드'}</div></div><button class="ib" title="방 나가기" id="gdel">🚪</button></div>
+<div class="msgs" id="ms"></div><div class="ainote">ⓘ AI가 생성한 대화입니다 · 메시지 1번에 데모 크레딧 1</div><div class="inbar"><textarea id="inp" rows="1" placeholder="모두에게 말하기"></textarea><button class="send" id="snd">➤</button></div></div>`;
+const box=$('#ms'),inp=$('#inp');const save=()=>{R=LS.get('cc_rooms',[]);const k=R.findIndex(x=>x.id===rid);r.t=Date.now();if(k>=0)R[k]=r;LS.set('cc_rooms',R)};
+const draw=typ=>{box.innerHTML=`<div class="intro"><div class="gav" style="width:72px;height:72px;margin:0 auto 6px">${ms.map(c=>`<i style="${avBg(c)}"></i>`).join('')}</div>${ms.map(c=>`<a href="#c/${c.id}" style="color:var(--tx)">${esc(c.name)}</a>`).join(' · ')}</div>`+r.m.map(x=>{if(x.r==='user')return `<div class="mrow u"><div class="bub">${fmt(x.t)}</div></div>`;const c=chars.find(y=>y.id===x.c)||{name:'?'};return `<div class="mrow b"><div class="mav" style="${avBg(c)}">${avTxt(c)}</div><div style="min-width:0;max-width:80%"><div class="gname">${esc(c.name)}</div><div class="bub" style="max-width:100%">${fmt(x.t)}</div></div></div>`}).join('')+(typ?`<div class="mrow b"><div class="mav" style="${avBg(typ)}">${avTxt(typ)}</div><div class="bub typing"><span></span><span></span><span></span></div></div>`:'');box.scrollTop=box.scrollHeight};draw();
+async function speak(c,t){const prevMsg=[...r.m].reverse().find(x=>x.r==='assistant'&&x.c!==c.id),prev=prevMsg&&chars.find(y=>y.id===prevMsg.c);
+if(!LS.get('cc_set',{}).key){await new Promise(z=>setTimeout(z,600+Math.random()*700));return gline(c,r.m[r.m.length-1].r==='assistant'?prev:null,t)}
+const others=ms.filter(x=>x.id!==c.id).map(x=>x.name).join(', ');
+return await llm([{role:'system',content:sysPrompt(c)+`\n\n[그룹 채팅] 지금은 사용자와 ${others}이(가) 함께 있는 단체 대화방이다. 너는 오직 ${c.name}로서 1~3문장으로 짧게 말한다. 다른 사람의 말에 반응하거나 이름을 불러도 좋다. 다른 인물의 대사를 대신 쓰지 않는다.`},...r.m.slice(-24).map(x=>x.c===c.id?{role:'assistant',content:x.t}:{role:'user',content:(x.r==='user'?(prof().nick||'사용자'):(chars.find(y=>y.id===x.c)||{}).name)+': '+x.t})],.95)||'…'}
+async function send(){const t=inp.value.trim();if(!t||gbusy)return;const cr=cred();if(cr.bal<1)return toast('데모 크레딧이 부족해요 · MY에서 출석 체크!');cr.bal--;LS.set('cc_credits',cr);
+inp.value='';gbusy=true;$('#snd').disabled=true;r.m.push({r:'user',t});save();ms.forEach(c=>addAff(c.id,1));
+const order=[...ms].sort(()=>Math.random()-.5).slice(0,Math.min(ms.length,2+Math.floor(Math.random()*2)));
+for(const c of order){if(location.hash!=='#room/'+rid)break;draw(c);let o;try{o=await speak(c,t)}catch(e){o='*연결 오류* '+e.message}r.m.push({r:'assistant',c:c.id,t:o});save();draw()}
+gbusy=false;$('#snd').disabled=false}
+$('#snd').onclick=send;inp.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();send()}};
+$('#gdel').onclick=()=>{if(!confirm('이 그룹 채팅방을 나갈까요? 대화가 삭제돼요.'))return;LS.set('cc_rooms',LS.get('cc_rooms',[]).filter(x=>x.id!==rid));location.hash='chats'}}
 function ago(t){if(!t)return '';const d=(Date.now()-t)/1000;return d<60?'방금':d<3600?Math.floor(d/60)+'분 전':d<86400?Math.floor(d/3600)+'시간 전':Math.floor(d/86400)+'일 전'}
 function chats(){const M=meta();const l=chars.map(c=>({c,m:LS.get('cc_chat_'+c.id,null),t:M[c.id]||0})).filter(x=>x.m&&x.m.some(y=>y.r==='user')).sort((a,b)=>b.t-a.t);
-$('#app').innerHTML=`<div class="top"><div class="ttl">대화</div></div>${l.length?l.map(({c,m,t})=>{const last=m[m.length-1];return `<div class="li" onclick="location.hash='chat/${c.id}'"><div class="mav" style="${avBg(c)}">${avTxt(c)}</div><div class="lt"><b>${esc(c.name)}<small>${ago(t)}</small></b><p>${last.r==='user'?'나: ':''}${esc(last.t.replace(/\*/g,'').replace(/\n+/g,' '))}</p></div></div>`}).join(''):`<div class="empty">아직 대화한 캐릭터가 없어요.<br><br><button class="pbtn" onclick="location.hash=''">캐릭터 둘러보기</button></div>`}${foot}`}
+const RM=LS.get('cc_rooms',[]).sort((a,b)=>b.t-a.t);
+$('#app').innerHTML=`<div class="top"><div class="ttl">대화</div><div class="sp"></div><button class="pbtn" style="padding:7px 12px;font-size:13px" onclick="location.hash='group'">👥 그룹 채팅</button></div>${RM.map(r=>{const ms=r.mem.map(i=>chars.find(c=>c.id===i)).filter(Boolean),last=r.m[r.m.length-1];return `<div class="li" onclick="location.hash='room/${r.id}'"><div class="gav">${ms.slice(0,4).map(c=>`<i style="${avBg(c)}"></i>`).join('')}</div><div class="lt"><b>${esc(r.name)} <small style="color:var(--ac)">${ms.length}명</small><small>${ago(r.t)}</small></b><p>${last?esc((last.c?(chars.find(c=>c.id===last.c)||{}).name+': ':'나: ')+last.t.replace(/\*/g,'').replace(/\n+/g,' ')):'새 그룹 채팅'}</p></div></div>`}).join('')}${l.length||RM.length?l.map(({c,m,t})=>{const last=m[m.length-1];return `<div class="li" onclick="location.hash='chat/${c.id}'"><div class="mav" style="${avBg(c)}">${avTxt(c)}</div><div class="lt"><b>${esc(c.name)}<small>${ago(t)}</small></b><p>${last.r==='user'?'나: ':''}${esc(last.t.replace(/\*/g,'').replace(/\n+/g,' '))}</p></div></div>`}).join(''):`<div class="empty">아직 대화한 캐릭터가 없어요.<br><br><button class="pbtn" onclick="location.hash=''">캐릭터 둘러보기</button></div>`}${foot}`}
 function my(){const p=prof(),cr=cred(),s=LS.get('cc_set',{}),done=cr.last===today();
 $('#app').innerHTML=`<div class="top"><div class="ttl">MY</div></div><div class="form">
 <div class="box"><h3>👤 내 프로필</h3><div class="f"><label>닉네임<small>캐릭터가 나를 부르는 이름</small></label><input id="p-n" maxlength="20" value="${esc(p.nick)}" placeholder="예: 민지"></div>
