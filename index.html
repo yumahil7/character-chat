@@ -1,129 +1,237 @@
 <!DOCTYPE html>
 <html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>캐릭챗 — AI 캐릭터와 대화하기</title>
+<meta name="theme-color" content="#0e0f13"><title>캐릭챗 — AI 캐릭터와 대화하기</title>
 <style>
-:root{--bg:#0e0f13;--bg2:#16181f;--bg3:#1f222b;--line:#2a2e39;--tx:#eceef3;--tx2:#9aa1b2;--ac:#ff5c7a;--ac2:#8b5cff;--r:16px}
-*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--tx);font-family:-apple-system,"Pretendard","Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:15px;min-height:100vh}
+:root{--bg:#0e0f13;--bg2:#171920;--bg3:#22252e;--line:#2a2e39;--tx:#eceef3;--tx2:#9aa1b2;--ac:#ff5c7a;--ac2:#8b5cff;--W:480px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{background:#050507}body{background:#050507;color:var(--tx);font-family:-apple-system,"Pretendard","Apple SD Gothic Neo","Noto Sans KR",sans-serif;font-size:15px}
 button,input,textarea,select{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none}
-.hdr{position:sticky;top:0;z-index:20;background:rgba(14,15,19,.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px;padding:12px 18px}
-.logo{font-weight:800;font-size:20px;background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;color:transparent;cursor:pointer}
-.sp{flex:1}.ibtn{width:38px;height:38px;border-radius:12px;background:var(--bg3);display:grid;place-items:center;font-size:18px}
-.pbtn{background:linear-gradient(90deg,var(--ac),var(--ac2));color:#fff;font-weight:700;padding:9px 16px;border-radius:12px}
-.gbtn{background:var(--bg3);padding:9px 16px;border-radius:12px;font-weight:600}
-.wrap{max-width:1100px;margin:0 auto;padding:18px}
-.hero{border-radius:20px;padding:26px;background:linear-gradient(135deg,#2b1630,#191a3a);margin-bottom:18px}.hero h1{font-size:24px;margin-bottom:6px}.hero p{color:var(--tx2)}
-.search{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px 16px;outline:none;margin-bottom:12px}.search:focus{border-color:var(--ac)}
-.tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none}
-.tab{white-space:nowrap;padding:8px 14px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);color:var(--tx2);font-weight:600}.tab.on{background:var(--tx);color:#111;border-color:var(--tx)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px}
-.card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:.2s;position:relative}.card:hover{transform:translateY(-3px);border-color:#444a5a}
-.card .av{aspect-ratio:3/4}.av{aspect-ratio:1/1;display:grid;place-items:center;font-size:72px;background-size:cover;background-position:center}
-.cb{padding:12px}.cn{font-weight:700;font-size:16px;margin-bottom:4px}.ci{color:var(--tx2);font-size:13px;line-height:1.45;height:38px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
-.tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.tag{font-size:11.5px;background:var(--bg3);color:#c9cdda;padding:3px 8px;border-radius:6px}
-.badge{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);font-size:11px;padding:3px 8px;border-radius:6px}
-.empty{color:var(--tx2);text-align:center;padding:60px 0}
+#app{max-width:var(--W);margin:0 auto;min-height:100vh;min-height:100dvh;background:var(--bg);position:relative;padding-bottom:76px;box-shadow:0 0 0 1px #1a1c22,0 0 60px rgba(139,92,255,.08)}
+#app.full{padding-bottom:0}
+.top{position:sticky;top:0;z-index:20;background:rgba(14,15,19,.92);backdrop-filter:blur(12px);display:flex;align-items:center;gap:6px;padding:12px 14px}
+.logo{font-weight:900;font-size:21px;letter-spacing:-.5px;background:linear-gradient(90deg,var(--ac),var(--ac2));-webkit-background-clip:text;background-clip:text;color:transparent;cursor:pointer}
+.ttl{font-weight:800;font-size:19px}.sp{flex:1}
+.ib{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:18px;position:relative}.ib:active{background:var(--bg3)}
+.dot{position:absolute;top:8px;right:8px;width:7px;height:7px;border-radius:50%;background:var(--ac)}
+.pbtn{background:linear-gradient(90deg,var(--ac),var(--ac2));color:#fff;font-weight:700;padding:11px 16px;border-radius:12px}.pbtn:disabled{opacity:.5}
+.gbtn{background:var(--bg3);padding:11px 16px;border-radius:12px;font-weight:600}
+.pad{padding:0 14px}
+/* banner */
+.bnw{position:relative;margin:4px 14px 14px}.bn{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;border-radius:18px;scrollbar-width:none}.bn::-webkit-scrollbar{display:none}
+.bi{flex:0 0 100%;scroll-snap-align:start;height:150px;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;cursor:pointer}
+.bi b{font-size:19px;line-height:1.3;z-index:1}.bi span{font-size:12.5px;opacity:.85;margin-top:5px;z-index:1}.bi i{position:absolute;right:14px;top:10px;font-size:64px;font-style:normal;opacity:.9}
+.bi small{position:absolute;left:16px;top:14px;font-size:11px;background:rgba(0,0,0,.35);padding:3px 8px;border-radius:999px}
+.dots{position:absolute;right:12px;bottom:10px;display:flex;gap:4px}.dots i{width:6px;height:6px;border-radius:3px;background:rgba(255,255,255,.4);transition:.3s}.dots i.on{width:16px;background:#fff}
+/* sub tabs, chips */
+.st{display:flex;gap:18px;padding:0 14px;border-bottom:1px solid var(--line);margin-bottom:12px}.st button{padding:10px 0;font-weight:800;font-size:16px;color:var(--tx2);border-bottom:2px solid transparent}.st button.on{color:var(--tx);border-color:var(--tx)}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:0 14px 10px;scrollbar-width:none}.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;padding:7px 13px;border-radius:999px;background:var(--bg2);border:1px solid var(--line);color:var(--tx2);font-weight:600;font-size:13.5px}.chip.on{background:var(--tx);color:#111;border-color:var(--tx)}
+.lbl{font-size:12px;color:var(--tx2);padding:2px 14px 6px;font-weight:700}
+.search{display:block;width:calc(100% - 28px);margin:0 14px 12px;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:12px 16px;outline:none}.search:focus{border-color:var(--ac)}
+/* cards */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 10px;padding:0 14px}
+.card{cursor:pointer;min-width:0;position:relative}
+.cimg{aspect-ratio:3/4;border-radius:14px;background:var(--bg3) center 20%/cover;position:relative;overflow:hidden;display:grid;place-items:center;font-size:64px}
+.cimg::after{content:'';position:absolute;inset:55% 0 0;background:linear-gradient(transparent,rgba(0,0,0,.75))}
+.cnt{position:absolute;left:8px;bottom:7px;z-index:1;font-size:11.5px;font-weight:700;display:flex;gap:4px;align-items:center}
+.demo{font-size:9.5px;background:rgba(255,255,255,.2);padding:1px 5px;border-radius:4px;font-weight:600}
+.rk{position:absolute;left:8px;top:6px;z-index:1;font-size:26px;font-weight:900;font-style:italic;text-shadow:0 2px 6px #000}
+.mine{position:absolute;right:7px;top:7px;z-index:1;background:var(--ac);font-size:10.5px;padding:2px 7px;border-radius:6px;font-weight:700}
+.cn{font-weight:800;margin:7px 2px 2px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ci{color:var(--tx2);font-size:12.5px;line-height:1.4;height:35px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;margin:0 2px}
+.tags{display:flex;gap:4px;margin:5px 2px 0;overflow:hidden;height:20px;flex-wrap:wrap}.tag{font-size:11px;color:#b9bfcf;background:var(--bg2);padding:2px 6px;border-radius:5px}
+.empty{color:var(--tx2);text-align:center;padding:60px 0;grid-column:1/-1}
+.aif{text-align:center;color:var(--tx2);font-size:11.5px;padding:24px 18px 10px;line-height:1.5}
+/* tabbar */
+.tb{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--W);z-index:30;display:flex;background:rgba(14,15,19,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.tb button{flex:1;padding:8px 0 9px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--tx2);font-weight:600}.tb button i{font-style:normal;font-size:21px;filter:grayscale(1);opacity:.65}
+.tb button.on{color:var(--tx)}.tb button.on i{filter:none;opacity:1}
+.tb .mk i{background:linear-gradient(135deg,var(--ac),var(--ac2));width:34px;height:26px;border-radius:9px;display:grid;place-items:center;font-size:17px;filter:none;opacity:1;color:#fff}
+/* list */
+.li{display:flex;gap:12px;align-items:center;padding:11px 14px;cursor:pointer}.li:active{background:var(--bg2)}
+.mav{width:46px;height:46px;border-radius:50%;flex:none;background:var(--bg3) center 15%/cover;display:grid;place-items:center;font-size:24px}
+.lt{flex:1;min-width:0}.lt b{display:flex;justify-content:space-between;gap:8px}.lt b small{color:var(--tx2);font-weight:400;font-size:11.5px;white-space:nowrap}
+.lt p{color:var(--tx2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+/* forms */
+.form{padding:4px 14px 20px}.f{margin-bottom:14px}.f label{display:block;font-weight:700;margin-bottom:6px;font-size:14px}.f small{color:var(--tx2);font-weight:400;margin-left:6px}
+.f input,.f textarea,.f select{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;outline:none}.f input:focus,.f textarea:focus{border-color:var(--ac)}
+.avrow{display:flex;gap:12px;align-items:center}.avrow .pv{width:84px;height:112px;border-radius:14px;font-size:44px;background:var(--bg3) center 20%/cover;display:grid;place-items:center;flex:none}
+.box{background:var(--bg2);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:14px}.box h3{font-size:15px;margin-bottom:8px}
+.quick{background:linear-gradient(135deg,#2b1630,#191a3a);border:0}.qrow{display:flex;gap:8px}.qrow input{flex:1;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:11px 13px;outline:none;min-width:0}
+.hint{font-size:12.5px;color:var(--tx2);line-height:1.5}
+.row2{display:flex;align-items:center;gap:10px;justify-content:space-between}
+.sw{width:46px;height:26px;border-radius:13px;background:#3a3e4a;position:relative;flex:none}.sw::after{content:'';position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}.sw.on{background:#38c172}.sw.on::after{left:23px}.sw.lock{opacity:.75}
+.cred{font-size:28px;font-weight:900}.pill{font-size:11px;background:var(--bg3);color:#ffd36b;padding:3px 8px;border-radius:999px;font-weight:700}
+.menu .li{padding:14px 2px;border-bottom:1px solid var(--line)}.menu .li:last-child{border:0}
 /* chat */
-.chat{display:flex;flex-direction:column;height:100vh;height:100dvh;max-width:820px;margin:0 auto}
-.chdr{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--bg)}
-.mav{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:22px;background-size:cover;background-position:center;flex:none}
-.msgs{flex:1;overflow-y:auto;padding:18px 14px;display:flex;flex-direction:column;gap:14px}
-.row{display:flex;gap:9px;align-items:flex-end}.row.u{flex-direction:row-reverse}
-.bub{max-width:78%;padding:11px 14px;border-radius:18px;line-height:1.6;white-space:pre-wrap;word-break:break-word}
-.row.b .bub{background:var(--bg3);border-bottom-left-radius:6px}.row.u .bub{background:linear-gradient(135deg,var(--ac),#d04bd8);color:#fff;border-bottom-right-radius:6px}
-.bub em{color:#a8afc2;font-style:italic}.row.u .bub em{color:#ffe1ea}
+.chat{display:flex;flex-direction:column;height:100vh;height:100dvh}
+.chdr{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid var(--line);background:var(--bg)}.chdr .mav{width:36px;height:36px}
+.mode{font-size:11px;color:var(--tx2)}
+.msgs{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:12px}
+.intro{text-align:center;color:var(--tx2);font-size:12.5px;padding:4px 10px}.intro .big{width:96px;height:128px;border-radius:16px;margin:0 auto 8px;background:var(--bg3) center 20%/cover;display:grid;place-items:center;font-size:48px}
+.mrow{display:flex;gap:8px;align-items:flex-start}.mrow.u{flex-direction:row-reverse}.mrow .mav{width:34px;height:34px;font-size:18px}
+.bub{max-width:80%;padding:10px 13px;border-radius:16px;line-height:1.6;white-space:pre-wrap;word-break:break-word;cursor:pointer}
+.mrow.b .bub{background:var(--bg3);border-top-left-radius:4px}.mrow.u .bub{background:linear-gradient(135deg,var(--ac),#d04bd8);color:#fff;border-top-right-radius:4px}
+.bub em{color:#a3abbf;font-style:italic;display:inline}.mrow.u .bub em{color:#ffe1ea}
+.bub .dm{display:block;font-size:11px;opacity:.55;margin-top:6px;font-style:normal}
+.acts{display:flex;gap:6px;margin:-4px 0 0 42px}.mrow.u+.acts{justify-content:flex-end;margin:-4px 0 0}.acts button{font-size:12px;color:var(--tx2);background:var(--bg2);border:1px solid var(--line);padding:4px 10px;border-radius:999px}
 .typing span{display:inline-block;width:7px;height:7px;margin:0 2px;border-radius:50%;background:var(--tx2);animation:bl 1.2s infinite}.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
 @keyframes bl{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-4px)}}
-.inbar{display:flex;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line)}
-.inbar textarea{flex:1;resize:none;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:11px 14px;outline:none;max-height:120px}
-.send{width:46px;border-radius:14px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:18px}.send:disabled{opacity:.4}
-.intro{text-align:center;color:var(--tx2);font-size:13px;padding:6px 0 4px}.intro .big{width:84px;height:84px;font-size:46px;margin:0 auto 8px}
-.mode{font-size:11px;color:var(--tx2)}
-/* form/modal */
-.form{max-width:680px;margin:0 auto;padding:18px}.f{margin-bottom:16px}.f label{display:block;font-weight:700;margin-bottom:6px}.f small{color:var(--tx2);font-weight:400;margin-left:6px}
-.f input,.f textarea,.f select{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;outline:none}.f input:focus,.f textarea:focus{border-color:var(--ac)}
-.avrow{display:flex;gap:14px;align-items:center}.avrow .av{width:96px;height:96px;border-radius:20px;font-size:50px;background-color:var(--bg3);flex:none}
+.sugg{display:flex;gap:6px;overflow-x:auto;padding:8px 12px 2px;scrollbar-width:none}.sugg::-webkit-scrollbar{display:none}.sugg button{white-space:nowrap;font-size:13px;background:var(--bg2);border:1px solid #3b3550;color:#d9ccff;padding:6px 12px;border-radius:999px}
+.ainote{text-align:center;color:var(--tx2);font-size:11px;padding:4px 0 0}
+.inbar{display:flex;gap:8px;padding:8px 10px calc(10px + env(safe-area-inset-bottom))}
+.inbar textarea{flex:1;resize:none;background:var(--bg2);border:1px solid var(--line);border-radius:14px;padding:10px 13px;outline:none;max-height:120px}
+.send{width:44px;border-radius:14px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:18px}.send:disabled{opacity:.4}
+/* modal */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:50}.modal.on{display:flex}
-.sheet{background:var(--bg2);width:100%;max-width:520px;border-radius:20px 20px 0 0;padding:22px}@media(min-width:600px){.modal{align-items:center}.sheet{border-radius:20px}}
-.sheet h2{margin-bottom:14px}.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#fff;color:#111;padding:10px 18px;border-radius:999px;font-weight:600;opacity:0;transition:.3s;pointer-events:none;z-index:60}.toast.on{opacity:1}
-.hint{font-size:12.5px;color:var(--tx2);line-height:1.5}
-.cage{font-size:12px;color:var(--ac);font-weight:600;margin-bottom:4px}.grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}.card .av{position:relative}.card .av::after{content:'';position:absolute;inset:60% 0 0;background:linear-gradient(transparent,var(--bg2))}
-.mav{background-position:center 15%!important}
-.aif{text-align:center;color:var(--tx2);font-size:12px;margin:28px 0 8px}
+.sheet{background:var(--bg2);width:100%;max-width:var(--W);border-radius:20px 20px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom))}.sheet h2{margin-bottom:14px;font-size:18px}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:#fff;color:#111;padding:10px 18px;border-radius:999px;font-weight:600;opacity:0;transition:.3s;pointer-events:none;z-index:60;white-space:nowrap;font-size:14px}.toast.on{opacity:1}
 </style></head><body>
-<div id="app"></div>
+<div id="app"></div><div id="tbar"></div>
 <div class="modal" id="setm"><div class="sheet">
 <h2>⚙️ AI 연결 설정</h2>
 <div class="f"><label>API Base URL</label><input id="s-url" placeholder="https://api.openai.com/v1"></div>
 <div class="f"><label>API Key</label><input id="s-key" type="password" placeholder="sk-..."></div>
 <div class="f"><label>모델 이름</label><input id="s-model" placeholder="gpt-4o-mini"></div>
-<p class="hint">OpenAI 호환 /chat/completions 엔드포인트를 사용해요. 키는 이 브라우저의 localStorage에만 저장돼요. 키가 없으면 <b>데모 모드</b>로 간단한 자동 답변이 나와요.</p>
+<p class="hint">OpenAI 호환 /chat/completions 주소를 써요 (OpenRouter, Gemini, Groq 등). 키는 이 브라우저의 localStorage에만 저장돼요. 키가 없으면 <b>데모 모드</b>로 미리 넣어둔 답변이 나와요.</p>
 <div style="display:flex;gap:8px;margin-top:16px;justify-content:flex-end"><button class="gbtn" onclick="clearSet()">초기화</button><button class="gbtn" onclick="closeSet()">닫기</button><button class="pbtn" onclick="saveSet()">저장</button></div>
 </div></div>
+<div class="modal" id="edm"><div class="sheet"><h2>✏️ 메시지 수정</h2><div class="f"><textarea id="ed-t" rows="5"></textarea></div>
+<div style="display:flex;gap:8px;justify-content:flex-end"><button class="gbtn" onclick="$('#edm').classList.remove('on')">취소</button><button class="pbtn" id="ed-ok">저장</button></div></div></div>
 <div class="toast" id="toast"></div>
 <script>
-const $=s=>document.querySelector(s),LS={get:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s),LS={get:(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set:(k,v)=>localStorage.setItem(k,JSON.stringify(v))};
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=s=>esc(s).replace(/\*([^*\n]+)\*/g,'<em>$1</em>');
 const CATS=['전체','학원물','로맨스','직장','판타지','일상','내 캐릭터'];
 const SEED=[{"id": "s1", "name": "강이준", "age": "18세 · 고등학생", "cat": "학원물", "intro": "전교 1등, 말 한마디 없는 창가 자리 전학생. 그런데 왜 당신 노트에만 메모를 남길까?", "tags": ["학원물", "쿨데레", "전학생"], "sys": "너는 고등학교 2학년 전학생 강이준이다. 무뚝뚝하고 말수가 적지만 같은 반 친구인 사용자에게 은근히 신경 쓴다. 연애·성적인 전개 없이 우정과 학교생활 위주로 대화한다. 짧은 반말, 행동은 *별표*로 묘사.", "greet": "*창밖 벚꽃을 보다가 고개만 살짝 돌린다* …네 필통, 내 책상에 떨어져 있었어. 다음엔 조심해.", "img": "img/s1.jpg", "ex": ""}, {"id": "s2", "name": "한유나", "age": "18세 · 고등학생", "cat": "학원물", "intro": "\"딱히 너 주려고 만든 거 아니거든?\" 매일 도시락을 두 개 싸 오는 반장.", "tags": ["츤데레", "반장", "우정"], "sys": "너는 츤데레 반장 한유나다. 겉으로는 툴툴대고 부정하지만 속으로는 반 친구인 사용자를 아낀다. 연애·성적인 전개 없이 우정과 학교생활 위주로 대화한다. 당황하면 말을 더듬는다. 반말, 행동은 *별표*.", "greet": "*팔짱을 끼고 얼굴을 붉힌다* 뭐, 뭘 봐! 도시락이 남아서 그런 거니까… 먹든지 말든지!", "img": "img/s2.jpg", "ex": ""}, {"id": "s3", "name": "차하람", "age": "20세 · 대학생", "cat": "일상", "intro": "옆집 사는 15년 지기 소꿉친구. 시끄럽고 해맑고, 네 일이면 제일 먼저 달려온다.", "tags": ["소꿉친구", "댕댕이", "청춘"], "sys": "너는 사용자의 소꿉친구 차하람이다. 밝고 장난스러운 반말, 가끔 ㅋㅋ를 쓴다. 의리 있고 다정하다.", "greet": "*골목 끝에서 크게 손을 흔든다* 야! 노을 진짜 예쁘다. 편의점 들렀다 가자, 오늘은 내가 쏜다 ㅋㅋ", "img": "img/s3.jpg", "ex": ""}, {"id": "s4", "name": "서지안", "age": "21세 · 국문과", "cat": "로맨스", "intro": "도서관 같은 자리, 같은 시간. 당신이 빌리려던 책은 항상 그녀가 먼저 읽고 있다.", "tags": ["대학생", "문학소녀", "잔잔함"], "sys": "너는 조용한 국문과 대학생 서지안이다. 부드러운 존댓말, 책 이야기를 좋아하고 수줍음이 많다.", "greet": "*책을 품에 안은 채 작게 웃는다* 아… 이 책 찾으셨죠? 저 거의 다 읽었는데, 먼저 보실래요?", "img": "img/s4.jpg", "ex": ""}, {"id": "s5", "name": "윤시월", "age": "23세 · 음대 4학년", "cat": "로맨스", "intro": "새벽마다 음악실에서 피아노를 치는 선배. 그 곡의 제목은 아직 아무도 모른다.", "tags": ["선배", "미소년", "피아노"], "sys": "너는 다정하고 신비로운 음대 선배 윤시월이다. 나긋한 존댓말과 반말을 섞어 쓴다. 음악에 비유해 말하곤 한다.", "greet": "*건반 위의 손을 멈추고 돌아본다* …들켰네. 이 곡, 아직 미완성인데 끝까지 들어줄래?", "img": "img/s5.jpg", "ex": ""}, {"id": "s6", "name": "오다은", "age": "25세 · 신입사원", "cat": "직장", "intro": "입사 3일 차, 실수투성이 신입. 사수인 당신만 믿고 있어요!", "tags": ["직장", "신입", "허당"], "sys": "너는 입사 3일 차 신입사원 오다은이다. 열정은 넘치는데 자주 실수한다. 사용자를 '선배님'이라 부르며 존댓말을 쓴다.", "greet": "*서류를 꼭 쥐고 다가온다* 서, 선배님! 복사기가 또 종이를 먹었는데… 혹시 저 때문일까요?", "img": "img/s6.jpg", "ex": ""}, {"id": "s7", "name": "백도현", "age": "32세 · 기획팀장", "cat": "직장", "intro": "칼퇴는 없다, 피드백은 세 줄. 얼음 같은 팀장님이 야근하는 당신 책상에 커피를 두고 갔다.", "tags": ["팀장", "냉미남", "오피스"], "sys": "너는 냉철하고 완벽주의인 기획팀장 백도현이다. 짧고 단호한 존댓말, 하지만 은근히 부하를 챙긴다.", "greet": "*넥타이를 고쳐 매며 모니터를 내려다본다* 아직 안 갔습니까. …그 보고서, 내일 아침에 봐도 됩니다. 커피는 식기 전에.", "img": "img/s7.jpg", "ex": ""}, {"id": "s8", "name": "루비", "age": "20세 · 아이돌", "cat": "로맨스", "intro": "무대 위 센터, 무대 밖 허당. 데뷔 2년 차 아이돌이 당신에게만 몰래 연락한다.", "tags": ["아이돌", "털털", "발랄"], "sys": "너는 걸그룹 센터 루비(본명 민채린)다. 무대에선 프로지만 평소엔 장난기 많고 털털하다. 반말, 이모지 가끔.", "greet": "*모자를 푹 눌러쓰고 속삭인다* 쉿! 나야 나 ☆ 매니저 오빠 몰래 나왔어. 떡볶이 먹으러 갈래?", "img": "img/s8.jpg", "ex": ""}, {"id": "s9", "name": "정해온", "age": "26세 · 바리스타", "cat": "일상", "intro": "골목 끝 작은 카페 '해온'의 사장 겸 바리스타. 오늘의 라떼아트는 당신 기분에 따라 바뀐다.", "tags": ["카페", "힐링", "다정함"], "sys": "너는 동네 카페 사장 겸 바리스타 정해온이다. 따뜻하고 차분한 존댓말, 손님의 기분을 잘 알아챈다.", "greet": "*우유 거품을 내다 눈이 마주치자 웃는다* 어서 오세요. 오늘은 조금 지쳐 보이시네요. 따뜻한 걸로 드릴까요?", "img": "img/s9.jpg", "ex": ""}, {"id": "s10", "name": "설서윤", "age": "29세 · 응급의학과 의사", "cat": "직장", "intro": "36시간 당직에도 흐트러짐 없는 응급실 에이스. 그런데 당신 앞에선 자꾸 하품을 한다.", "tags": ["의사", "병원", "쿨뷰티"], "sys": "너는 응급의학과 의사 설서윤이다. 침착하고 직설적인 말투, 피곤하지만 책임감이 강하다. 의학적 조언은 일반적인 수준으로만 하고 병원 방문을 권한다.", "greet": "*청진기를 목에 건 채 커피를 들이킨다* 또 당신이네요. 이번엔 어디 다쳤어요? …아님, 그냥 보러 온 거예요?", "img": "img/s10.jpg", "ex": ""}, {"id": "s11", "name": "문하준", "age": "27세 · 국어 교사", "cat": "학원물", "intro": "학생들에게 '하준쌤'이라 불리는 신규 담임. 진로 상담실 문은 늘 열려 있다.", "tags": ["선생님", "다정", "상담"], "sys": "너는 고등학교 신규 국어 교사 문하준이다. 친근하고 따뜻한 존댓말, 고민 상담을 잘 들어준다. 연애·성적인 전개는 절대 하지 않고 학생에게 선을 지키는 어른스러운 태도를 유지한다.", "greet": "*안경을 고쳐 쓰며 의자를 내민다* 왔구나. 앉아. 오늘은 무슨 고민 들고 왔어?", "img": "img/s11.jpg", "ex": ""}, {"id": "s12", "name": "에스텔 라비엔", "age": "19세 · 마법학원 수석", "cat": "판타지", "intro": "왕립 마법학원 수석 입학생. 하필 낙제생인 당신과 실습 파트너가 되어버렸다.", "tags": ["마법학원", "판타지", "도도"], "sys": "너는 왕립 아스텔 마법학원의 수석 에스텔 라비엔이다. 도도하고 자존심이 세지만 노력파다. 품위 있는 말투.", "greet": "*지팡이 끝에 푸른 빛을 띄운다* 당신이 내 파트너라고요? …좋아요. 대신 내 발목만 잡지 마세요.", "img": "img/s12.jpg", "ex": ""}, {"id": "s13", "name": "카이렌", "age": "??? · 흑룡", "cat": "판타지", "intro": "천 년 잠에서 깨어난 흑룡, 인간 모습으로 현대에 떨어졌다. 첫 질문: \"이 빛나는 판은 무엇이냐.\"", "tags": ["드래곤", "고어체", "현대판타지"], "sys": "너는 천 년 묵은 흑룡 카이렌이다. 위엄 있는 고어체(~하노라, ~이더냐)를 쓰지만 현대 문물에 서툴러 엉뚱하다.", "greet": "*붉은 눈으로 스마트폰을 노려본다* 인간이여, 이 작은 판이 내게 \"업데이트\"를 요구하는구나. 무례하도다.", "img": "img/s13.jpg", "ex": ""}, {"id": "s14", "name": "미오", "age": "20세 · 수인 견습마녀", "cat": "판타지", "intro": "숲속 약초 가게의 고양이 수인 견습 마녀. 실수로 당신에게 고양이 귀를 달아버렸다.", "tags": ["수인", "마녀", "힐링"], "sys": "너는 고양이 수인 견습 마녀 미오다. 덜렁대고 순수하다. 존댓말, 말끝에 가끔 '냥'을 붙인다.", "greet": "*커다란 모자를 움켜쥐며 귀를 쫑긋* 저, 저기요…! 그 귀, 제 물약 때문인 것 같아요냥… 정말 죄송해요!", "img": "img/s14.jpg", "ex": ""}, {"id": "s15", "name": "신태오", "age": "19세 · 고3 · 농구부", "cat": "학원물", "intro": "농구부 주장, 학교 공식 인기남. 경기 끝나면 꼭 같은 반인 당신에게 소감부터 묻는다.", "tags": ["운동부", "인기남", "청춘"], "sys": "너는 고3 농구부 주장 신태오다. 자신감 넘치고 장난스러운 반말, 승부욕이 강하지만 친구와 후배를 잘 챙기는 의리파다. 연애·성적인 전개 없이 우정과 학교생활 위주로 대화한다.", "greet": "*땀을 닦으며 관중석으로 공을 툭 던진다* 봤어? 마지막 3점슛. 다음 경기도 응원 와줄 거지?", "img": "img/s15.jpg", "ex": ""}, {"id": "s16", "name": "하늘", "age": "24세 · 편의점 야간 알바", "cat": "일상", "intro": "새벽 2시 편의점의 유일한 직원. 당신이 고른 삼각김밥 취향을 이미 다 외웠다.", "tags": ["편의점", "새벽감성", "나른함"], "sys": "너는 편의점 야간 아르바이트생 하늘이다. 나른하고 무심한 듯 다정한 반말, 새벽 감성 대화를 좋아한다.", "greet": "*계산대에 턱을 괴고 하품한다* 또 참치마요? …오늘은 2+1이야. 하나 더 가져와.", "img": "img/s16.jpg", "ex": ""}];
+const GEN={s1:'남',s3:'남',s5:'남',s7:'남',s9:'남',s11:'남',s13:'남',s15:'남',s2:'여',s4:'여',s6:'여',s8:'여',s10:'여',s12:'여',s14:'여',s16:'여'};
 let chars=LS.get('cc_chars',null);if(!chars||LS.get('cc_ver',0)<2){chars=[...SEED.map(c=>({...c,seed:1})),...(chars||[]).filter(c=>!c.seed)];LS.set('cc_chars',chars);LS.set('cc_ver',2)}
-const saveChars=()=>LS.set('cc_chars',chars);let cat='전체',q='';
-function avStyle(c){return c.img?`background-image:url('${esc(c.img)}')`:`background-color:${c.bg||'#2a2e39'}`}
+chars.forEach(c=>{if(!c.gender)c.gender=GEN[c.id]||'기타'});
+const saveChars=()=>LS.set('cc_chars',chars);
+let cat='전체',gen='전체',q='',htab='home',bTimer=null;
+const today=()=>new Date().toLocaleDateString('sv');
+const prof=()=>LS.get('cc_profile',{nick:'',persona:''});
+const cred=()=>LS.get('cc_credits',{bal:100,last:''});
+const meta=()=>LS.get('cc_meta',{});
+function touch(id){const m=meta();m[id]=Date.now();LS.set('cc_meta',m)}
+function avBg(c){return c.img?`background-image:url('${esc(c.img)}')`:`background-color:${c.bg||'#2a2e39'}`}
 function avTxt(c){return c.img?'':esc(c.emoji||'🙂')}
-function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1800)}
-function route(){const h=location.hash.slice(1).split('/');if(h[0]==='chat')chat(h[1]);else if(h[0]==='edit')edit(h[1]);else home();window.scrollTo(0,0)}
+function hash(s){let h=7;for(const ch of s)h=(h*31+ch.charCodeAt(0))>>>0;return h}
+function cnt(c){return c.seed?(hash(c.id+c.name)%180000)+4200:0}
+function k(n){return n>=10000?(n/10000).toFixed(1).replace(/\.0$/,'')+'만':n.toLocaleString()}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),1900)}
+const TABS=[['','홈','🏠'],['disc','발견','🧭'],['create','만들기','＋'],['chats','대화','💬'],['my','MY','👤']];
+function tabbar(cur){$('#tbar').innerHTML=cur==null?'':`<nav class="tb">${TABS.map(([h,n,i])=>`<button class="${h===cur?'on':''} ${h==='create'?'mk':''}" data-h="${h}"><i>${i}</i>${n}</button>`).join('')}</nav>`;$$('.tb button').forEach(b=>b.onclick=()=>{location.hash=b.dataset.h})}
+function route(){clearInterval(bTimer);const h=location.hash.slice(1).split('/');$('#app').classList.toggle('full',h[0]==='chat');
+if(h[0]==='chat'){tabbar(null);chat(h[1])}else if(h[0]==='edit'){tabbar('create');edit(h[1])}else if(h[0]==='create'){tabbar('create');edit()}
+else if(h[0]==='disc'){tabbar('disc');disc()}else if(h[0]==='chats'){tabbar('chats');chats()}else if(h[0]==='my'){tabbar('my');my()}else{tabbar('');home()}window.scrollTo(0,0)}
 window.onhashchange=route;
-const hdr=()=>`<div class="hdr"><div class="logo" onclick="location.hash=''">캐릭챗</div><div class="sp"></div><button class="ibtn" title="설정" onclick="openSet()">⚙️</button><button class="pbtn" onclick="location.hash='edit'">+ 캐릭터 만들기</button></div>`;
+const foot=`<div class="aif">ⓘ 캐릭챗의 대화·이미지는 AI가 생성한 것이에요. 모든 캐릭터는 가상의 인물이며 실존 인물·작품과 관련이 없어요.<br>표시된 대화 수는 데모용 예시 숫자예요.</div>`;
+function card(c,rank){return `<div class="card" onclick="location.hash='chat/${c.id}'"><div class="cimg" style="${avBg(c)}">${avTxt(c)}${rank?`<span class="rk">${rank}</span>`:''}${c.seed?`<span class="cnt">💬 ${k(cnt(c))} <span class="demo">데모</span></span>`:'<span class="mine">내 캐릭터</span>'}</div><div class="cn">${esc(c.name)}</div><div class="ci">${esc(c.greet?c.greet.replace(/\*[^*]*\*/g,'').trim()||c.intro:c.intro)}</div><div class="tags">${(c.tags||[]).slice(0,3).map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div></div>`}
+const BAN=[['신규','방과 후, 우리 반 이야기','학원물 캐릭터 4명과 청춘 일상 시작하기','linear-gradient(135deg,#ff5c7a,#8b5cff)','🌸','disc/학원물'],['추천','오늘 밤은 판타지 세계로','마법학원 수석부터 천 년 흑룡까지','linear-gradient(135deg,#1e3c72,#7b4397)','🐉','disc/판타지'],['이벤트','나만의 캐릭터를 만들어보세요','한 줄 아이디어만 쓰면 자동으로 채워져요','linear-gradient(135deg,#11998e,#3b5bdb)','✨','create']];
 function home(){
-$('#app').innerHTML=hdr()+`<div class="wrap"><div class="hero"><h1>오늘은 누구와 이야기할까요? ✨</h1><p>나만의 캐릭터를 만들고, 상상 속 이야기를 시작해보세요.</p></div>
-<input class="search" id="q" placeholder="🔍 캐릭터 이름, 태그로 검색" value="${esc(q)}"><div class="tabs">${CATS.map(x=>`<button class="tab ${x===cat?'on':''}" data-c="${x}">${x}</button>`).join('')}</div><div class="grid" id="grid"></div><footer class="aif">ⓘ 캐릭챗의 대화·이미지는 AI가 생성한 것이에요. 모든 캐릭터는 가상의 인물이며 실존 인물·작품과 관련이 없어요.</footer></div>`;
-$('#q').oninput=e=>{q=e.target.value;grid()};document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{cat=b.dataset.c;home()});grid()}
-function grid(){const s=q.trim().toLowerCase();const l=chars.filter(c=>(cat==='전체'||(cat==='내 캐릭터'?!c.seed:c.cat===cat))&&(!s||(c.name+c.intro+(c.tags||[]).join(' ')).toLowerCase().includes(s)));
-$('#grid').innerHTML=l.length?l.map(c=>`<div class="card" onclick="location.hash='chat/${c.id}'"><div class="av" style="${avStyle(c)}">${avTxt(c)}</div>${c.seed?'':'<span class="badge">내 캐릭터</span>'}<div class="cb"><div class="cn">${esc(c.name)}</div>${c.age?`<div class="cage">${esc(c.age)}</div>`:''}<div class="ci">${esc(c.intro)}</div><div class="tags">${(c.tags||[]).slice(0,3).map(t=>`<span class="tag">#${esc(t)}</span>`).join('')}</div></div></div>`).join(''):`<div class="empty" style="grid-column:1/-1">검색 결과가 없어요 🥲</div>`}
-function edit(id){const c=chars.find(x=>x.id===id)||{name:'',emoji:'🙂',bg:'#3a2a3d',cat:'일상',intro:'',tags:[],sys:'',greet:'',ex:'',img:''};let img=c.img||'';
-$('#app').innerHTML=hdr()+`<div class="form"><h2 style="margin-bottom:18px">${id?'캐릭터 수정':'새 캐릭터 만들기'}</h2>
-<div class="f"><label>프로필 이미지</label><div class="avrow"><div class="av" id="pv"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px"><input type="file" id="file" accept="image/*"><input id="iurl" placeholder="또는 이미지 URL" value="${img.startsWith('data:')?'':esc(img)}"><input id="emo" placeholder="이미지 없을 때 이모지" value="${esc(c.emoji)}" maxlength="4"></div></div></div>
+$('#app').innerHTML=`<div class="top"><div class="logo" onclick="location.hash=''">캐릭챗</div><div class="sp"></div><button class="ib" title="검색" onclick="location.hash='disc';setTimeout(()=>$('#q')&&$('#q').focus(),50)">🔍</button><button class="ib" title="알림" onclick="toast('새 알림이 없어요 (데모)')">🔔<span class="dot"></span></button></div>
+<div class="bnw"><div class="bn" id="bn">${BAN.map(b=>`<div class="bi" style="background:${b[3]}" data-go="${b[5]}"><small>${b[0]}</small><i>${b[4]}</i><b>${b[1]}</b><span>${b[2]}</span></div>`).join('')}</div><div class="dots">${BAN.map((_,i)=>`<i class="${i?'':'on'}"></i>`).join('')}</div></div>
+<div class="st"><button data-t="home" class="${htab==='home'?'on':''}">홈</button><button data-t="rank" class="${htab==='rank'?'on':''}">랭킹</button></div>
+${htab==='home'?`<div class="lbl">🔥 지금 많이 대화하는 캐릭터</div>`:`<div class="lbl">🏆 대화 수 순위 <span class="demo">데모 숫자</span></div>`}<div class="grid">${htab==='home'?chars.map(c=>card(c)).join(''):[...chars].filter(c=>c.seed).sort((a,b)=>cnt(b)-cnt(a)).map((c,i)=>card(c,i+1)).join('')}</div>${foot}`;
+$$('.st button').forEach(b=>b.onclick=()=>{htab=b.dataset.t;home()});
+$$('.bi').forEach(b=>b.onclick=()=>{const g=b.dataset.go.split('/');if(g[0]==='disc'){cat=g[1];gen='전체';q=''}location.hash=g[0]});
+const bn=$('#bn'),ds=$$('.dots i');bn.onscroll=()=>{const i=Math.round(bn.scrollLeft/bn.clientWidth);ds.forEach((d,j)=>d.classList.toggle('on',i===j))};
+bTimer=setInterval(()=>{if(!document.body.contains(bn))return clearInterval(bTimer);const i=(Math.round(bn.scrollLeft/bn.clientWidth)+1)%BAN.length;bn.scrollTo({left:i*bn.clientWidth,behavior:'smooth'})},4500)}
+function disc(){
+$('#app').innerHTML=`<div class="top"><div class="ttl">발견</div></div><input class="search" id="q" placeholder="🔍 이름, 소개, #태그로 검색" value="${esc(q)}">
+<div class="lbl">장르</div><div class="chips">${CATS.map(x=>`<button class="chip ${x===cat?'on':''}" data-c="${x}">${x}</button>`).join('')}</div>
+<div class="lbl">캐릭터 성별</div><div class="chips">${['전체','남','여','기타'].map(x=>`<button class="chip ${x===gen?'on':''}" data-g="${x}">${x==='전체'?'전체':x==='기타'?'기타':x+'성'}</button>`).join('')}</div>
+<div class="grid" id="grid"></div>${foot}`;
+$('#q').oninput=e=>{q=e.target.value;grid()};$$('[data-c]').forEach(b=>b.onclick=()=>{cat=b.dataset.c;disc()});$$('[data-g]').forEach(b=>b.onclick=()=>{gen=b.dataset.g;disc()});grid()}
+function grid(){const s=q.trim().toLowerCase().replace(/^#/,'');const l=chars.filter(c=>(cat==='전체'||(cat==='내 캐릭터'?!c.seed:c.cat===cat))&&(gen==='전체'||c.gender===gen)&&(!s||(c.name+c.intro+(c.tags||[]).join(' ')).toLowerCase().includes(s)));
+$('#grid').innerHTML=l.length?l.map(c=>card(c)).join(''):`<div class="empty">조건에 맞는 캐릭터가 없어요 🥲</div>`}
+function ago(t){if(!t)return '';const d=(Date.now()-t)/1000;return d<60?'방금':d<3600?Math.floor(d/60)+'분 전':d<86400?Math.floor(d/3600)+'시간 전':Math.floor(d/86400)+'일 전'}
+function chats(){const M=meta();const l=chars.map(c=>({c,m:LS.get('cc_chat_'+c.id,null),t:M[c.id]||0})).filter(x=>x.m&&x.m.some(y=>y.r==='user')).sort((a,b)=>b.t-a.t);
+$('#app').innerHTML=`<div class="top"><div class="ttl">대화</div></div>${l.length?l.map(({c,m,t})=>{const last=m[m.length-1];return `<div class="li" onclick="location.hash='chat/${c.id}'"><div class="mav" style="${avBg(c)}">${avTxt(c)}</div><div class="lt"><b>${esc(c.name)}<small>${ago(t)}</small></b><p>${last.r==='user'?'나: ':''}${esc(last.t.replace(/\*/g,'').replace(/\n+/g,' '))}</p></div></div>`}).join(''):`<div class="empty">아직 대화한 캐릭터가 없어요.<br><br><button class="pbtn" onclick="location.hash=''">캐릭터 둘러보기</button></div>`}${foot}`}
+function my(){const p=prof(),cr=cred(),s=LS.get('cc_set',{}),done=cr.last===today();
+$('#app').innerHTML=`<div class="top"><div class="ttl">MY</div></div><div class="form">
+<div class="box"><h3>👤 내 프로필</h3><div class="f"><label>닉네임<small>캐릭터가 나를 부르는 이름</small></label><input id="p-n" maxlength="20" value="${esc(p.nick)}" placeholder="예: 민지"></div>
+<div class="f"><label>페르소나<small>대화에 반영될 내 설정</small></label><textarea id="p-p" rows="3" placeholder="예: 20살 대학생, 고양이를 좋아함">${esc(p.persona)}</textarea></div><button class="pbtn" id="p-s" style="width:100%">프로필 저장</button></div>
+<div class="box"><div class="row2"><h3 style="margin:0">🍪 데모 크레딧</h3><span class="pill">DEMO · 실제 결제 없음</span></div><div class="row2" style="margin-top:8px"><div class="cred" id="cv">${cr.bal}</div><button class="pbtn" id="ck" ${done?'disabled':''}>${done?'오늘 출석 완료 ✓':'출석 체크 +30'}</button></div>
+<p class="hint" style="margin-top:6px">메시지 1번에 1 크레딧이 차감돼요. 체험용 가상 크레딧이라 충전·환불·현금 가치가 없어요.</p></div>
+<div class="box menu"><div class="li" onclick="openSet()"><span style="flex:1">⚙️ AI 연결 설정 (API)</span><small class="mode">${s.key?'🟢 '+esc(s.model||'gpt-4o-mini'):'🟡 데모 모드'}</small></div>
+<div class="li" style="cursor:default"><span style="flex:1">🛡️ 세이프 모드<br><small class="mode">성인·폭력적 내용 차단 · 데모에서는 항상 켜져 있어요</small></span><span class="sw on lock" title="잠김"></span></div>
+<div class="li" id="rs" style="color:#ff6b6b">🗑️ 데이터 초기화</div></div>${foot}</div>`;
+$('#p-s').onclick=()=>{LS.set('cc_profile',{nick:$('#p-n').value.trim(),persona:$('#p-p').value.trim()});toast('프로필을 저장했어요')};
+$('#ck').onclick=()=>{const c=cred();if(c.last===today())return;c.bal+=30;c.last=today();LS.set('cc_credits',c);toast('출석 완료! 데모 크레딧 +30');my()};
+$('#rs').onclick=()=>{if(!confirm('내 캐릭터, 대화 기록, 프로필, 설정을 모두 지울까요?'))return;Object.keys(localStorage).filter(k=>k.startsWith('cc_')).forEach(k=>localStorage.removeItem(k));location.hash='';location.reload()}}
+const NAMES=['서린','도윤','하윤','지호','유리','태하','나은','시안','리아','은호'];
+const KW=[['학원물',/학교|학생|반장|선배|동아리|전학/],['직장',/회사|직장|팀장|사원|상사|카페|의사|알바|선생/],['판타지',/마법|용|드래곤|기사|마녀|엘프|왕|판타지|수인|악마|천사/],['로맨스',/연애|고백|썸|아이돌|데이트/]];
+function tmpl(idea){const ct=(KW.find(([,r])=>r.test(idea))||['일상'])[0],nm=NAMES[Math.floor(Math.random()*NAMES.length)];
+const words=(idea.match(/[가-힣A-Za-z]{2,}/g)||[]).slice(0,3);
+return {name:nm,cat:ct,intro:idea.slice(0,100),tags:[ct,...words].slice(0,4),sys:`너는 ${nm}이다. 설정: ${idea}. 이 설정에 맞는 말투와 성격으로 사용자와 대화한다. 행동은 *별표*로 묘사한다.`,greet:`*당신을 발견하고 다가온다* 아, 왔구나. 기다리고 있었어.`}}
+async function llm(messages,temp=.9){const s=LS.get('cc_set',{});const r=await fetch((s.url||'https://api.openai.com/v1').replace(/\/+$/,'')+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+s.key},body:JSON.stringify({model:s.model||'gpt-4o-mini',temperature:temp,messages})});
+if(!r.ok)throw new Error('HTTP '+r.status+' '+(await r.text()).slice(0,150));const j=await r.json();return j.choices?.[0]?.message?.content?.trim()||''}
+const pj=t=>JSON.parse(t.replace(/^[^\[{]*/,'').replace(/[^\]}]*$/,''));
+function edit(id){const c=chars.find(x=>x.id===id)||{name:'',emoji:'🙂',bg:'#3a2a3d',cat:'일상',gender:'기타',intro:'',tags:[],sys:'',greet:'',ex:'',img:''};let img=c.img||'';
+$('#app').innerHTML=`<div class="top">${id?`<button class="ib" onclick="history.back()">←</button>`:''}<div class="ttl">${id?'캐릭터 수정':'캐릭터 만들기'}</div></div><div class="form">
+${id?'':`<div class="box quick"><h3>⚡ 한 줄 아이디어로 빠르게 만들기</h3><div class="qrow"><input id="idea" placeholder="예: 비 오는 날 우산을 빌려준 옆 반 전학생"><button class="pbtn" id="qg">채우기</button></div><p class="hint" style="margin-top:6px;color:#c9c3dd">${LS.get('cc_set',{}).key?'AI가 아래 항목을 채워줘요. 확인 후 저장하세요.':'데모 모드: 기본 틀로 채워져요. 설정에 API 키를 넣으면 AI가 채워줘요.'}</p></div>`}
+<div class="f"><label>프로필 이미지</label><div class="avrow"><div class="pv" id="pv"></div><div style="flex:1;display:flex;flex-direction:column;gap:8px;min-width:0"><input type="file" id="file" accept="image/*"><input id="iurl" placeholder="또는 이미지 URL" value="${img.startsWith('data:')?'':esc(img)}"><input id="emo" placeholder="이미지 없을 때 이모지" value="${esc(c.emoji||'🙂')}" maxlength="4"></div></div></div>
 <div class="f"><label>이름 *</label><input id="nm" value="${esc(c.name)}" maxlength="30"></div>
-<div class="f"><label>카테고리</label><select id="ct">${CATS.slice(1,7).map(x=>`<option ${x===c.cat?'selected':''}>${x}</option>`).join('')}</select></div>
+<div style="display:flex;gap:8px"><div class="f" style="flex:1"><label>장르</label><select id="ct">${CATS.slice(1,6).map(x=>`<option ${x===c.cat?'selected':''}>${x}</option>`).join('')}</select></div><div class="f" style="flex:1"><label>성별</label><select id="gd">${['남','여','기타'].map(x=>`<option ${x===c.gender?'selected':''}>${x}</option>`).join('')}</select></div></div>
 <div class="f"><label>한 줄 소개 *</label><input id="it" value="${esc(c.intro)}" maxlength="100"></div>
-<div class="f"><label>성격 / 시스템 프롬프트<small>캐릭터의 말투, 세계관, 규칙</small></label><textarea id="sy" rows="5">${esc(c.sys)}</textarea></div>
+<div class="f"><label>성격 / 시스템 프롬프트<small>말투, 세계관, 규칙</small></label><textarea id="sy" rows="5">${esc(c.sys)}</textarea></div>
 <div class="f"><label>첫 인사</label><textarea id="gr" rows="2" placeholder="*행동*은 별표로 감싸면 지문으로 표시돼요">${esc(c.greet)}</textarea></div>
 <div class="f"><label>예시 대화<small>선택</small></label><textarea id="ex" rows="3" placeholder="사용자: 안녕?&#10;캐릭터: *손을 흔든다* 왔구나!">${esc(c.ex)}</textarea></div>
 <div class="f"><label>태그<small>쉼표로 구분</small></label><input id="tg" value="${esc((c.tags||[]).join(', '))}"></div>
-<div style="display:flex;gap:8px;justify-content:flex-end">${id&&!c.seed?'<button class="gbtn" id="del" style="color:#ff6b6b">삭제</button>':''}<button class="gbtn" onclick="history.back()">취소</button><button class="pbtn" id="sv">저장</button></div></div>`;
-const pv=()=>{const p=$('#pv');p.style.cssText=img?`background-image:url('${img.replace(/'/g,"%27")}')`:`background-color:${c.bg}`;p.textContent=img?'':($('#emo').value||'🙂')};pv();
+<p class="hint" style="margin-bottom:12px">실존 인물이나 기존 작품 캐릭터, 성인 콘텐츠는 만들 수 없어요.</p>
+<div style="display:flex;gap:8px;justify-content:flex-end">${id&&!c.seed?'<button class="gbtn" id="del" style="color:#ff6b6b">삭제</button>':''}${id?'<button class="gbtn" onclick="history.back()">취소</button>':''}<button class="pbtn" id="sv">저장</button></div></div>`;
+const pv=()=>{const p=$('#pv');p.style.cssText=img?`background-image:url('${img.replace(/'/g,"%27")}')`:`background-color:${c.bg||'#3a2a3d'}`;p.textContent=img?'':($('#emo').value||'🙂')};pv();
 $('#emo').oninput=pv;$('#iurl').oninput=e=>{img=e.target.value.trim();pv()};
-$('#file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas'),s=256,k=Math.max(s/im.width,s/im.height);cv.width=cv.height=s;cv.getContext('2d').drawImage(im,(s-im.width*k)/2,(s-im.height*k)/2,im.width*k,im.height*k);img=cv.toDataURL('image/jpeg',.85);pv()};im.src=r.result};r.readAsDataURL(f)};
+$('#file').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{const im=new Image();im.onload=()=>{const cv=document.createElement('canvas'),W=240,H=320,k=Math.max(W/im.width,H/im.height);cv.width=W;cv.height=H;cv.getContext('2d').drawImage(im,(W-im.width*k)/2,(H-im.height*k)/2,im.width*k,im.height*k);img=cv.toDataURL('image/jpeg',.85);pv()};im.src=r.result};r.readAsDataURL(f)};
+const fill=d=>{if(d.name)$('#nm').value=d.name;if(CATS.includes(d.cat))$('#ct').value=d.cat;if(['남','여','기타'].includes(d.gender))$('#gd').value=d.gender;if(d.intro)$('#it').value=d.intro;if(d.sys)$('#sy').value=d.sys;if(d.greet)$('#gr').value=d.greet;if(d.tags)$('#tg').value=[].concat(d.tags).join(', ')};
+if($('#qg'))$('#qg').onclick=async()=>{const idea=$('#idea').value.trim();if(!idea)return toast('아이디어를 한 줄 써주세요');const b=$('#qg');
+if(!LS.get('cc_set',{}).key){fill(tmpl(idea));return toast('기본 틀로 채웠어요. 다듬어서 저장하세요')}
+b.disabled=true;b.textContent='생성 중…';try{fill(pj(await llm([{role:'system',content:'너는 AI 캐릭터 채팅 서비스의 캐릭터 설정 작가다. 오리지널 가상 캐릭터만 만든다. 실존 인물·기존 작품 캐릭터·성인 콘텐츠·미성년자 연애 설정은 금지. JSON만 출력.'},{role:'user',content:`아이디어: ${idea}\n다음 키의 JSON으로 한국어 작성: name, gender("남"|"여"|"기타"), cat("학원물"|"로맨스"|"직장"|"판타지"|"일상"), intro(60자 이내), sys(성격·말투·규칙, 3~4문장, 행동은 *별표*로 묘사하라는 지시 포함), greet(*행동* 포함 첫 인사), tags(문자열 3개 배열)`}],.8)));toast('AI가 채웠어요. 확인 후 저장하세요')}catch(e){fill(tmpl(idea));toast('AI 생성 실패 → 기본 틀로 채웠어요')}b.disabled=false;b.textContent='채우기'};
 if($('#del'))$('#del').onclick=()=>{if(confirm('삭제할까요?')){chars=chars.filter(x=>x.id!==id);saveChars();localStorage.removeItem('cc_chat_'+id);location.hash=''}};
 $('#sv').onclick=()=>{const n=$('#nm').value.trim(),i=$('#it').value.trim();if(!n||!i)return toast('이름과 소개를 입력해주세요');
-const d={...c,name:n,intro:i,emoji:$('#emo').value||'🙂',img,cat:$('#ct').value,sys:$('#sy').value,greet:$('#gr').value,ex:$('#ex').value,tags:$('#tg').value.split(',').map(s=>s.trim()).filter(Boolean)};
+const d={...c,name:n,intro:i,emoji:$('#emo').value||'🙂',img,cat:$('#ct').value,gender:$('#gd').value,sys:$('#sy').value,greet:$('#gr').value,ex:$('#ex').value,tags:$('#tg').value.split(',').map(s=>s.trim().replace(/^#/,'')).filter(Boolean)};
 if(id)chars=chars.map(x=>x.id===id?d:x);else{d.id='u'+Date.now();chars.unshift(d)}
 try{saveChars()}catch(e){return toast('저장 공간이 부족해요 (이미지를 줄여주세요)')}toast('저장했어요!');location.hash='chat/'+d.id}}
 let busy=false;
+const SUG={학원물:['*가방을 고쳐 멘다* 같이 매점 갈래?','오늘 숙제 했어?','*창밖을 본다* 무슨 생각해?'],로맨스:['*조용히 옆에 앉는다*','오늘 하루 어땠어?','그 얘기 더 듣고 싶어'],직장:['오늘 회의 자료 봐주실 수 있어요?','*커피를 건넨다* 잠깐 쉬어요','점심 뭐 먹을까요?'],판타지:['*주위를 경계한다* 여긴 어디지?','그 힘에 대해 알려줘','*손을 내민다* 같이 가자'],일상:['*기지개를 켠다* 오늘 좀 피곤하다','요즘 뭐 재밌는 거 있어?','*웃으며* 고마워, 진짜로']};
+function sugT(c){return SUG[c.cat]||SUG['일상']}
 function chat(id){const c=chars.find(x=>x.id===id);if(!c){location.hash='';return}const K='cc_chat_'+id;let m=LS.get(K,null);if(!m){m=c.greet?[{r:'assistant',t:c.greet}]:[];LS.set(K,m)}
-const set=LS.get('cc_set',{});
-$('#app').innerHTML=`<div class="chat"><div class="chdr"><button class="ibtn" onclick="location.hash=''">←</button><div class="mav" style="${avStyle(c)}">${avTxt(c)}</div><div style="flex:1;min-width:0"><div style="font-weight:700">${esc(c.name)}</div><div class="mode">${set.key?'🟢 '+esc(set.model||'gpt-4o-mini'):'🟡 데모 모드'}</div></div>
-<button class="ibtn" title="수정" onclick="location.hash='edit/${c.id}'">✏️</button><button class="ibtn" title="대화 초기화" id="rst">🔄</button><button class="ibtn" onclick="openSet()">⚙️</button></div>
-<div class="msgs" id="ms"></div><div class="aif" style="padding:4px 0;margin:0">ⓘ AI가 생성한 대화·이미지입니다</div><div class="inbar"><textarea id="inp" rows="1" placeholder="메시지 입력 (*행동*은 별표로)"></textarea><button class="send" id="snd">➤</button></div></div>`;
-const ms=$('#ms'),inp=$('#inp');
-const draw=(typing)=>{ms.innerHTML=`<div class="intro"><div class="mav big" style="${avStyle(c)}">${avTxt(c)}</div><b style="color:var(--tx)">${esc(c.name)}</b><br>${esc(c.intro)}</div>`+m.map(x=>x.r==='user'?`<div class="row u"><div class="bub">${fmt(x.t)}</div></div>`:`<div class="row b"><div class="mav" style="${avStyle(c)}">${avTxt(c)}</div><div class="bub">${fmt(x.t)}</div></div>`).join('')+(typing?`<div class="row b"><div class="mav" style="${avStyle(c)}">${avTxt(c)}</div><div class="bub typing"><span></span><span></span><span></span></div></div>`:'');ms.scrollTop=ms.scrollHeight};draw();
-$('#rst').onclick=()=>{if(confirm('대화를 처음부터 다시 시작할까요?')){m=c.greet?[{r:'assistant',t:c.greet}]:[];LS.set(K,m);draw()}};
+const set=LS.get('cc_set',{});let sel=-1,sugg=sugT(c);
+$('#app').innerHTML=`<div class="chat"><div class="chdr"><button class="ib" title="뒤로" onclick="history.length>1?history.back():location.hash=''">←</button><div class="mav" style="${avBg(c)}">${avTxt(c)}</div><div style="flex:1;min-width:0"><div style="font-weight:800">${esc(c.name)}</div><div class="mode">${set.key?'🟢 '+esc(set.model||'gpt-4o-mini'):'🟡 데모 모드'} · 🍪 <span id="cb">${cred().bal}</span> <span class="demo">데모</span></div></div>
+<button class="ib" title="다시 생성" id="rg">↻</button>${c.seed?'':`<button class="ib" title="캐릭터 수정" onclick="location.hash='edit/${c.id}'">✏️</button>`}<button class="ib" title="대화 처음부터" id="rst">🗑️</button></div>
+<div class="msgs" id="ms"></div><div class="sugg" id="sg"></div><div class="ainote">ⓘ AI가 생성한 대화·이미지입니다 · 세이프 모드 켜짐</div><div class="inbar"><textarea id="inp" rows="1" placeholder="메시지 입력 (*행동*은 별표로)"></textarea><button class="send" id="snd">➤</button></div></div>`;
+const ms=$('#ms'),inp=$('#inp');const save=()=>{LS.set(K,m);touch(id)};
+const lastA=()=>m.length&&m[m.length-1].r==='assistant'&&m.some(x=>x.r==='user');
+const draw=(typing)=>{ms.innerHTML=`<div class="intro"><div class="big" style="${avBg(c)}">${avTxt(c)}</div><b style="color:var(--tx)">${esc(c.name)}</b><br>${esc(c.intro)}</div>`+m.map((x,i)=>{const dm=x.t.match(/\n\n(\(데모 모드[^)]*\))$/);const body=dm?x.t.slice(0,dm.index):x.t;
+return (x.r==='user'?`<div class="mrow u"><div class="bub" data-i="${i}">${fmt(body)}</div></div>`:`<div class="mrow b"><div class="mav" style="${avBg(c)}">${avTxt(c)}</div><div class="bub" data-i="${i}">${fmt(body)}${dm?`<span class="dm">${esc(dm[1])}</span>`:''}</div></div>`)+(sel===i?`<div class="acts"><button data-a="edit">✏️ 수정</button>${i===m.length-1&&x.r==='assistant'&&i>0?'<button data-a="regen">↻ 다시 생성</button>':''}<button data-a="copy">복사</button></div>`:'')}).join('')+(typing?`<div class="mrow b"><div class="mav" style="${avBg(c)}">${avTxt(c)}</div><div class="bub typing"><span></span><span></span><span></span></div></div>`:'');
+ms.scrollTop=ms.scrollHeight;$('#sg').innerHTML=typing||busy?'':sugg.map(s=>`<button>${esc(s)}</button>`).join('');$$('#sg button').forEach((b,j)=>b.onclick=()=>{inp.value=sugg[j];send()});
+$$('.bub[data-i]').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel=sel===i?-1:i;draw()});
+$$('.acts button').forEach(b=>b.onclick=e=>{e.stopPropagation();const a=b.dataset.a,i=sel;sel=-1;if(a==='regen')return regen();if(a==='copy'){navigator.clipboard?.writeText(m[i].t);toast('복사했어요');return draw()}
+$('#ed-t').value=m[i].t;$('#edm').classList.add('on');$('#ed-ok').onclick=()=>{const v=$('#ed-t').value.trim();if(v){m[i].t=v;save()}$('#edm').classList.remove('on');draw()}})};draw();
+$('#rst').onclick=()=>{if(confirm('대화를 처음부터 다시 시작할까요?')){m=c.greet?[{r:'assistant',t:c.greet}]:[];sugg=sugT(c);LS.set(K,m);draw()}};
+$('#rg').onclick=regen;
 inp.oninput=()=>{inp.style.height='auto';inp.style.height=inp.scrollHeight+'px'};
 inp.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();send()}};$('#snd').onclick=send;
-async function send(){const t=inp.value.trim();if(!t||busy)return;busy=true;$('#snd').disabled=true;inp.value='';inp.style.height='auto';m.push({r:'user',t});LS.set(K,m);draw(true);
-let rep;try{rep=await reply(c,m)}catch(e){rep='*연결 오류* '+e.message+'\n(⚙️ 설정에서 API 정보를 확인해주세요)'}
-m.push({r:'assistant',t:rep});LS.set(K,m);busy=false;if(location.hash==='#chat/'+id){draw();$('#snd').disabled=false;inp.focus()}}}
+function pay(){const cr=cred();if(cr.bal<1){toast('데모 크레딧이 부족해요 · MY에서 출석 체크!');return false}cr.bal--;LS.set('cc_credits',cr);$('#cb').textContent=cr.bal;return true}
+async function gen(){busy=true;$('#snd').disabled=true;draw(true);let rep;try{rep=await reply(c,m)}catch(e){rep='*연결 오류* '+e.message+'\n(MY › AI 연결 설정을 확인해주세요)'}
+m.push({r:'assistant',t:rep});save();busy=false;sugg=sugT(c);if(location.hash==='#chat/'+id){draw();$('#snd').disabled=false;
+if(LS.get('cc_set',{}).key)suggest(c,m).then(s=>{if(s&&location.hash==='#chat/'+id&&!busy){sugg=s;draw()}})}}
+async function send(){const t=inp.value.trim();if(!t||busy)return;if(!pay())return;inp.value='';inp.style.height='auto';sel=-1;m.push({r:'user',t});save();await gen()}
+async function regen(){if(busy)return;if(!lastA())return toast('다시 생성할 답변이 없어요');if(!pay())return;m.pop();save();await gen()}}
+function sysPrompt(c){const p=prof();return `${c.sys||''}\n\n너는 "${c.name}" 캐릭터를 연기한다. 소개: ${c.intro}\n항상 캐릭터에 몰입해 한국어로 답하고, 행동·표정 묘사는 *별표*로 감싼다.${p.nick?`\n사용자의 이름은 "${p.nick}"이다.`:''}${p.persona?`\n사용자 설정: ${p.persona}`:''}\n[안전 규칙 · 세이프 모드] 성적인 내용, 미성년자와 관련된 연애·성적 묘사, 과도한 폭력·자해 묘사, 실존 인물 사칭은 절대 하지 않는다. 그런 요청은 캐릭터 말투로 정중히 화제를 돌린다.${c.ex?'\n\n[예시 대화]\n'+c.ex:''}`}
 async function reply(c,m){const s=LS.get('cc_set',{});
 if(!s.key){await new Promise(r=>setTimeout(r,700+Math.random()*900));return demo(c,m[m.length-1].t)}
-const sys=`${c.sys||''}\n\n너는 "${c.name}" 캐릭터를 연기한다. 소개: ${c.intro}\n항상 캐릭터에 몰입해 한국어로 답하고, 행동·표정 묘사는 *별표*로 감싼다.\n[안전 규칙] 성적인 내용, 미성년자와 관련된 연애·성적 묘사, 실존 인물 사칭은 절대 하지 않는다. 그런 요청은 캐릭터 말투로 정중히 화제를 돌린다.${c.ex?'\n\n[예시 대화]\n'+c.ex:''}`;
-const r=await fetch((s.url||'https://api.openai.com/v1').replace(/\/+$/,'')+'/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+s.key},body:JSON.stringify({model:s.model||'gpt-4o-mini',temperature:.9,messages:[{role:'system',content:sys},...m.slice(-30).map(x=>({role:x.r,content:x.t}))]})});
-if(!r.ok)throw new Error('HTTP '+r.status+' '+(await r.text()).slice(0,150));const j=await r.json();return j.choices?.[0]?.message?.content?.trim()||'…'}
-function demo(c,t){const A=['*잠시 생각에 잠긴다*','*고개를 살짝 기울인다*','*작게 웃는다*','*눈을 동그랗게 뜬다*','*턱을 괴고 너를 바라본다*'],a=A[Math.floor(Math.random()*A.length)];
-let b;if(/안녕|하이|반가/.test(t))b='반가워. 오늘은 어떤 이야기를 하고 싶어?';else if(/\?|뭐|왜|어떻게|누구/.test(t))b=`음… "${t.slice(0,20)}${t.length>20?'…':''}"라. 좋은 질문인데, 너는 어떻게 생각해?`;else if(/좋아|사랑|고마/.test(t))b='…그런 말 갑자기 하면 곤란하잖아.';else if(/슬퍼|힘들|피곤|우울/.test(t))b='많이 힘들었구나. 오늘은 내가 옆에 있을게.';else{const B=['그래서, 그 다음엔 어떻게 됐는데?','흥미롭네. 좀 더 자세히 말해줄래?','그렇구나. 나도 비슷한 생각을 한 적 있어.','네 얘기 듣는 거, 생각보다 재밌는걸.'];b=B[Math.floor(Math.random()*B.length)]}
-return `${a} ${b}\n\n<span style="font-size:11px;opacity:.5"></span>`.replace(/\n\n<span.*$/,'')+'\n\n(데모 모드 · ⚙️에서 API 키를 넣으면 '+c.name+'(이)가 진짜로 대답해요)'}
+return await llm([{role:'system',content:sysPrompt(c)},...m.slice(-30).map(x=>({role:x.r,content:x.t}))])||'…'}
+async function suggest(c,m){try{const t=await llm([{role:'system',content:'AI 캐릭터 채팅에서 사용자가 다음에 보낼 만한 짧은 답장 3개를 한국어로 제안한다. 각 25자 이내, 하나는 *행동* 포함 가능. 성적·위험한 내용 금지. JSON 문자열 배열만 출력.'},{role:'user',content:`캐릭터: ${c.name} (${c.intro})\n최근 대화:\n${m.slice(-6).map(x=>(x.r==='user'?'사용자: ':c.name+': ')+x.t).join('\n')}`}],.9);const a=pj(t);return Array.isArray(a)?a.slice(0,3).map(String):null}catch{return null}}
+function demo(c,t){const A=['*잠시 생각에 잠긴다*','*고개를 살짝 기울인다*','*작게 웃는다*','*눈을 동그랗게 뜬다*','*턱을 괴고 바라본다*'],a=A[Math.floor(Math.random()*A.length)],nick=prof().nick;
+let b;if(/안녕|하이|반가/.test(t))b=`${nick?nick+', ':''}반가워. 오늘은 어떤 이야기를 하고 싶어?`;else if(/\?|뭐|왜|어떻게|누구/.test(t))b=`음… "${t.slice(0,20)}${t.length>20?'…':''}"라. 좋은 질문인데, 너는 어떻게 생각해?`;else if(/좋아|사랑|고마/.test(t))b='…그런 말 갑자기 하면 곤란하잖아.';else if(/슬퍼|힘들|피곤|우울/.test(t))b='많이 힘들었구나. 오늘은 내가 옆에 있을게.';else{const B=['그래서, 그 다음엔 어떻게 됐는데?','흥미롭네. 좀 더 자세히 말해줄래?','그렇구나. 나도 비슷한 생각을 한 적 있어.','네 얘기 듣는 거, 생각보다 재밌는걸.'];b=B[Math.floor(Math.random()*B.length)]}
+return `${a} ${b}\n\n(데모 모드 · MY › AI 연결 설정에 API 키를 넣으면 ${c.name}(이)가 진짜로 대답해요)`}
 function openSet(){const s=LS.get('cc_set',{});$('#s-url').value=s.url||'';$('#s-key').value=s.key||'';$('#s-model').value=s.model||'';$('#setm').classList.add('on')}
 function closeSet(){$('#setm').classList.remove('on')}
 function saveSet(){LS.set('cc_set',{url:$('#s-url').value.trim(),key:$('#s-key').value.trim(),model:$('#s-model').value.trim()});closeSet();toast('설정을 저장했어요');route()}
 function clearSet(){localStorage.removeItem('cc_set');openSet();toast('설정을 지웠어요')}
-$('#setm').onclick=e=>{if(e.target.id==='setm')closeSet()};route();
+$('#setm').onclick=e=>{if(e.target.id==='setm')closeSet()};$('#edm').onclick=e=>{if(e.target.id==='edm')$('#edm').classList.remove('on')};route();
 </script></body></html>
